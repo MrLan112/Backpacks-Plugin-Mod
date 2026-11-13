@@ -1,0 +1,10 @@
+{
+  "key.backpacks.open": "Открыть рюкзак",
+  "key.category.backpacks.backpacks": "Рюкзаки",
+  "key.categories.backpacks": "Рюкзаки",
+  "screen.backpacks.slot": "Слот рюкзака",
+  "screen.backpacks.slot.empty": "Пусто — кликните, чтобы надеть рюкзак из инвентаря",
+  "screen.backpacks.slot.tier": "Надет рюкзак, тир %s",
+  "screen.backpacks.slot.hint": "ЛКМ — надеть или снять",
+  "screen.backpacks.slot.open": "ПКМ — открыть"
+}

@@ -1,0 +1,10 @@
+{
+  "key.backpacks.open": "Open backpack",
+  "key.category.backpacks.backpacks": "Backpacks",
+  "key.categories.backpacks": "Backpacks",
+  "screen.backpacks.slot": "Backpack slot",
+  "screen.backpacks.slot.empty": "Empty — click to equip a backpack from your inventory",
+  "screen.backpacks.slot.tier": "Equipped backpack, tier %s",
+  "screen.backpacks.slot.hint": "LMB to equip or remove",
+  "screen.backpacks.slot.open": "RMB to open"
+}

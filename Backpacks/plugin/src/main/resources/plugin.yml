@@ -1,0 +1,21 @@
+name: Backpacks
+version: '${version}'
+main: ru.backpacks.BackpacksPlugin
+api-version: '26.3'
+authors: [ Backpacks ]
+description: 17 tiers of wearable backpacks with an upgrade crafting chain.
+commands:
+  backpack:
+    description: Open or manage backpacks.
+    aliases: [ bp, rukzak, рюкзак ]
+    usage: /backpack
+permissions:
+  backpacks.use:
+    default: true
+    description: Use backpacks.
+  backpacks.admin:
+    default: op
+    description: Give, remove and reload backpacks.
+  backpacks.modbypass:
+    default: op
+    description: Join even when require-mod is enabled and the client mod is missing.

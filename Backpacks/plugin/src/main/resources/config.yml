@@ -1,0 +1,26 @@
+language: ru
+
+equipment:
+  # Остаётся ли надетый рюкзак на игроке после смерти.
+  keep-on-death: true
+
+storage:
+  file: backpacks.db
+
+# Клавиша открытия надетого рюкзака без мода.
+# SWAP_HANDS — F, NONE — выключено.
+hotkey: SWAP_HANDS
+# ПКМ пустой рукой открывает надетый рюкзак.
+open-empty-hand: true
+# Кикать игроков без клиентского мода.
+require-mod: false
+
+gui:
+  filler: GRAY_STAINED_GLASS_PANE
+  sound-open: BLOCK_CHEST_OPEN
+  sound-close: BLOCK_CHEST_CLOSE
+  sound-click: UI_BUTTON_CLICK
+  sound-upgrade: BLOCK_ANVIL_USE
+
+# Периодическое сохранение открытых рюкзаков, секунды. 0 — только при закрытии.
+autosave-seconds: 30

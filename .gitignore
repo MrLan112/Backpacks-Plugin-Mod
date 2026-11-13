@@ -1,0 +1,31 @@
+# Gradle
+Backpacks/.gradle/
+Backpacks/build/
+Backpacks/*/build/
+Backpacks/tools/gradle-9.9.1/
+Backpacks/tools/*.zip
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# OS
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Local test servers, logs and databases
+run/
+logs/
+*.log
+*.bak
+**/backpacks.db
+**/backpacks.db-wal
+**/backpacks.db-shm
+
+# Local scratch file, not part of the project
+proof_of_power.py

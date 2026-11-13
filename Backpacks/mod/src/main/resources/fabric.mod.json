@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "backpacks",
+  "version": "${version}",
+  "name": "Backpacks",
+  "description": "Client visuals and hotkey for the Backpacks server plugin.",
+  "authors": [ "Backpacks" ],
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": [ "ru.backpacks.mod.BackpacksMod" ]
+  },
+  "depends": {
+    "fabricloader": ">=0.20.1",
+    "minecraft": "~26.3",
+    "java": ">=25",
+    "fabric-api": "*"
+  }
+}

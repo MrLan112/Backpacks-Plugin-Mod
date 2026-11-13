@@ -1,0 +1,112 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "backpacks:item/backpack_16",
+    "body": "backpacks:item/backpack_16",
+    "flap": "backpacks:item/backpack_16",
+    "pocket": "backpacks:item/backpack_16",
+    "strap": "backpacks:item/backpack_16",
+    "buckle": "backpacks:item/backpack_16",
+    "side": "backpacks:item/backpack_16",
+    "accent": "backpacks:item/backpack_16",
+    "handle": "backpacks:item/backpack_16"
+  },
+  "elements": [
+    {
+      "from": [3, 3, 6],
+      "to": [13, 13, 10],
+      "faces": {
+        "north": {"uv": [0, 0, 4, 4], "texture": "#body"},
+        "east": {"uv": [0, 0, 4, 4], "texture": "#body"},
+        "south": {"uv": [0, 0, 4, 4], "texture": "#body"},
+        "west": {"uv": [0, 0, 4, 4], "texture": "#body"},
+        "up": {"uv": [4, 4, 8, 8], "texture": "#body"},
+        "down": {"uv": [4, 4, 8, 8], "texture": "#body"}
+      }
+    },
+    {
+      "from": [4.3, 4, 10.05],
+      "to": [6.1, 12.5, 10.45],
+      "faces": {
+        "north": {"uv": [12, 0, 16, 4], "texture": "#strap"},
+        "east": {"uv": [12, 0, 16, 4], "texture": "#strap"},
+        "south": {"uv": [12, 0, 16, 4], "texture": "#strap"},
+        "west": {"uv": [12, 0, 16, 4], "texture": "#strap"},
+        "up": {"uv": [12, 0, 16, 4], "texture": "#strap"},
+        "down": {"uv": [12, 0, 16, 4], "texture": "#strap"}
+      }
+    },
+    {
+      "from": [9.9, 4, 10.05],
+      "to": [11.7, 12.5, 10.45],
+      "faces": {
+        "north": {"uv": [12, 0, 16, 4], "texture": "#strap"},
+        "east": {"uv": [12, 0, 16, 4], "texture": "#strap"},
+        "south": {"uv": [12, 0, 16, 4], "texture": "#strap"},
+        "west": {"uv": [12, 0, 16, 4], "texture": "#strap"},
+        "up": {"uv": [12, 0, 16, 4], "texture": "#strap"},
+        "down": {"uv": [12, 0, 16, 4], "texture": "#strap"}
+      }
+    },
+    {
+      "from": [2.6, 11.2, 5.4],
+      "to": [13.4, 13.2, 10.6],
+      "faces": {
+        "north": {"uv": [4, 0, 8, 4], "texture": "#flap"},
+        "east": {"uv": [4, 0, 8, 4], "texture": "#flap"},
+        "south": {"uv": [4, 0, 8, 4], "texture": "#flap"},
+        "west": {"uv": [4, 0, 8, 4], "texture": "#flap"},
+        "up": {"uv": [8, 4, 12, 8], "texture": "#flap"},
+        "down": {"uv": [4, 0, 8, 4], "texture": "#flap"}
+      }
+    },
+    {
+      "from": [2.6, 8.4, 5.35],
+      "to": [13.4, 11.4, 6.2],
+      "faces": {
+        "north": {"uv": [4, 0, 8, 4], "texture": "#flap"},
+        "east": {"uv": [4, 0, 8, 4], "texture": "#flap"},
+        "south": {"uv": [4, 0, 8, 4], "texture": "#flap"},
+        "west": {"uv": [4, 0, 8, 4], "texture": "#flap"},
+        "up": {"uv": [8, 4, 12, 8], "texture": "#flap"},
+        "down": {"uv": [4, 0, 8, 4], "texture": "#flap"}
+      }
+    },
+    {
+      "from": [4.8, 3.6, 4.7],
+      "to": [11.2, 8, 5.6],
+      "faces": {
+        "north": {"uv": [8, 0, 12, 4], "texture": "#pocket"},
+        "east": {"uv": [8, 0, 12, 4], "texture": "#pocket"},
+        "south": {"uv": [8, 0, 12, 4], "texture": "#pocket"},
+        "west": {"uv": [8, 0, 12, 4], "texture": "#pocket"},
+        "up": {"uv": [8, 4, 12, 8], "texture": "#pocket"},
+        "down": {"uv": [8, 0, 12, 4], "texture": "#pocket"}
+      }
+    },
+    {
+      "from": [7, 9.3, 5.05],
+      "to": [9, 10.3, 5.34],
+      "faces": {
+        "north": {"uv": [0, 4, 4, 8], "texture": "#buckle"},
+        "east": {"uv": [0, 4, 4, 8], "texture": "#buckle"},
+        "south": {"uv": [0, 4, 4, 8], "texture": "#buckle"},
+        "west": {"uv": [0, 4, 4, 8], "texture": "#buckle"},
+        "up": {"uv": [0, 4, 4, 8], "texture": "#buckle"},
+        "down": {"uv": [0, 4, 4, 8], "texture": "#buckle"}
+      }
+    },
+    {
+      "from": [6, 13.2, 7.2],
+      "to": [10, 14, 8.8],
+      "faces": {
+        "north": {"uv": [12, 4, 16, 8], "texture": "#handle"},
+        "east": {"uv": [12, 4, 16, 8], "texture": "#handle"},
+        "south": {"uv": [12, 4, 16, 8], "texture": "#handle"},
+        "west": {"uv": [12, 4, 16, 8], "texture": "#handle"},
+        "up": {"uv": [12, 4, 16, 8], "texture": "#handle"},
+        "down": {"uv": [12, 4, 16, 8], "texture": "#handle"}
+      }
+    }
+  ]
+}
