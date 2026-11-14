@@ -34,51 +34,57 @@ public final class BackpackModel extends Model<Float> {
 
         CubeListBuilder body = CubeListBuilder.create().texOffs(0, 0)
                 // Main shell.
-                .addBox(-4.2F, 1.0F, 2.0F, 8.4F, 8.8F, 3.6F)
+                .addBox(-3.6F, 1.4F, 2.1F, 7.2F, 7.8F, 2.9F)
                 // Reinforced bottom.
-                .addBox(-4.0F, 9.4F, 2.3F, 8.0F, 0.9F, 3.1F)
+                .addBox(-3.4F, 9.2F, 2.2F, 6.8F, 0.7F, 2.7F)
                 // Rolled top.
-                .addBox(-4.0F, 0.3F, 2.3F, 8.0F, 1.1F, 3.2F)
-                .addBox(-4.55F, 0.4F, 2.4F, 0.6F, 0.9F, 3.0F)
-                .addBox(3.95F, 0.4F, 2.4F, 0.6F, 0.9F, 3.0F)
+                .addBox(-3.4F, 0.9F, 2.2F, 6.8F, 0.55F, 2.7F)
+                .addBox(-3.9F, 0.95F, 2.3F, 0.55F, 0.5F, 2.5F)
+                .addBox(3.35F, 0.95F, 2.3F, 0.55F, 0.5F, 2.5F)
                 // Side pockets.
-                .addBox(-4.85F, 4.1F, 2.5F, 0.75F, 3.3F, 2.9F)
-                .addBox(4.1F, 4.1F, 2.5F, 0.75F, 3.3F, 2.9F)
+                .addBox(-4.0F, 4.3F, 2.35F, 0.45F, 3.0F, 2.4F)
+                .addBox(3.55F, 4.3F, 2.35F, 0.45F, 3.0F, 2.4F)
                 // Front pocket.
-                .addBox(-2.9F, 4.7F, 5.55F, 5.8F, 3.6F, 0.75F)
+                .addBox(-2.4F, 4.9F, 4.95F, 4.8F, 2.8F, 0.55F)
                 // Back panel resting against the player.
-                .addBox(-4.1F, 1.2F, 1.9F, 8.2F, 8.4F, 0.3F);
+                .addBox(-3.5F, 1.5F, 2.0F, 7.0F, 7.5F, 0.15F);
 
         root.addOrReplaceChild("body", body, PartPose.ZERO);
         return new BackpackModel(LayerDefinition.create(mesh, 64, 64).bakeRoot());
     }
 
-    /** Flap, centre strap, buckles, shoulder straps and the handle. */
+    /**
+     * Flap, centre strap, buckles, shoulder straps and the handle. Every box stays
+     * inside or directly on the body silhouette, so the accent colour never shows
+     * as a glowing rim around the backpack.
+     */
     public static BackpackModel accents() {
         MeshDefinition mesh = new MeshDefinition();
         PartDefinition root = mesh.getRoot();
 
         CubeListBuilder accents = CubeListBuilder.create().texOffs(0, 32)
-                // Flap draping over the top.
-                .addBox(-4.35F, 0.5F, 1.9F, 8.7F, 2.7F, 4.1F)
+                // Flap: a thin cap on the top plus a strip draping down the front.
+                // Both stay inside the body's width, so no accent rim is visible from the side.
+                .addBox(-3.45F, 1.33F, 2.2F, 6.9F, 0.14F, 2.86F)
+                .addBox(-3.45F, 1.33F, 4.98F, 6.9F, 1.97F, 0.08F)
                 // Centre strap and buckle.
-                .addBox(-1.0F, 1.9F, 5.7F, 2.0F, 3.7F, 0.35F)
-                .addBox(-1.2F, 2.5F, 5.95F, 2.4F, 1.3F, 0.6F)
-                // Shoulder straps.
-                .addBox(-3.9F, 0.15F, -2.3F, 1.5F, 1.0F, 5.4F)
-                .addBox(2.4F, 0.15F, -2.3F, 1.5F, 1.0F, 5.4F)
+                .addBox(-0.75F, 2.9F, 5.05F, 1.5F, 1.7F, 0.15F)
+                .addBox(-0.95F, 3.4F, 5.2F, 1.9F, 1.0F, 0.2F)
+                // Shoulder straps against the player's back.
+                .addBox(-3.1F, 0.4F, 1.8F, 0.9F, 3.6F, 0.3F)
+                .addBox(2.2F, 0.4F, 1.8F, 0.9F, 3.6F, 0.3F)
                 // Strap adjusters.
-                .addBox(-3.85F, 2.2F, 2.95F, 1.4F, 0.6F, 0.35F)
-                .addBox(2.45F, 2.2F, 2.95F, 1.4F, 0.6F, 0.35F)
+                .addBox(-3.05F, 2.3F, 2.05F, 0.8F, 0.5F, 0.15F)
+                .addBox(2.25F, 2.3F, 2.05F, 0.8F, 0.5F, 0.15F)
                 // Handle and its posts.
-                .addBox(-1.7F, 0.1F, 3.2F, 3.4F, 0.7F, 1.8F)
-                .addBox(-1.9F, 0.5F, 3.1F, 0.5F, 1.0F, 2.0F)
-                .addBox(1.4F, 0.5F, 3.1F, 0.5F, 1.0F, 2.0F)
+                .addBox(-1.3F, 0.55F, 3.2F, 2.6F, 0.55F, 1.0F)
+                .addBox(-1.45F, 0.95F, 3.1F, 0.4F, 0.5F, 1.2F)
+                .addBox(1.05F, 0.95F, 3.1F, 0.4F, 0.5F, 1.2F)
                 // Rivets on the flap corners.
-                .addBox(-3.9F, 2.9F, 5.75F, 0.5F, 0.5F, 0.3F)
-                .addBox(3.4F, 2.9F, 5.75F, 0.5F, 0.5F, 0.3F)
-                .addBox(-3.9F, 0.8F, 5.75F, 0.5F, 0.5F, 0.3F)
-                .addBox(3.4F, 0.8F, 5.75F, 0.5F, 0.5F, 0.3F);
+                .addBox(-3.3F, 2.9F, 5.06F, 0.4F, 0.4F, 0.06F)
+                .addBox(2.9F, 2.9F, 5.06F, 0.4F, 0.4F, 0.06F)
+                .addBox(-3.3F, 1.6F, 5.06F, 0.4F, 0.4F, 0.06F)
+                .addBox(2.9F, 1.6F, 5.06F, 0.4F, 0.4F, 0.06F);
 
         root.addOrReplaceChild("accents", accents, PartPose.ZERO);
         return new BackpackModel(LayerDefinition.create(mesh, 64, 64).bakeRoot());
@@ -90,11 +96,11 @@ public final class BackpackModel extends Model<Float> {
         PartDefinition root = mesh.getRoot();
 
         CubeListBuilder frame = CubeListBuilder.create().texOffs(0, 48)
-                .addBox(-4.5F, 8.8F, 2.0F, 1.0F, 1.0F, 1.2F)
-                .addBox(3.5F, 8.8F, 2.0F, 1.0F, 1.0F, 1.2F)
-                .addBox(-4.5F, 8.8F, 4.4F, 1.0F, 1.0F, 1.2F)
-                .addBox(3.5F, 8.8F, 4.4F, 1.0F, 1.0F, 1.2F)
-                .addBox(-4.35F, 0.55F, 5.55F, 8.7F, 0.5F, 0.4F);
+                .addBox(-3.75F, 9.1F, 2.2F, 0.6F, 0.6F, 0.7F)
+                .addBox(3.15F, 9.1F, 2.2F, 0.6F, 0.6F, 0.7F)
+                .addBox(-3.75F, 9.1F, 4.3F, 0.6F, 0.6F, 0.7F)
+                .addBox(3.15F, 9.1F, 4.3F, 0.6F, 0.6F, 0.7F)
+                .addBox(-3.4F, 0.95F, 4.85F, 6.8F, 0.35F, 0.17F);
 
         root.addOrReplaceChild("frame", frame, PartPose.ZERO);
         return new BackpackModel(LayerDefinition.create(mesh, 64, 64).bakeRoot());
@@ -106,11 +112,11 @@ public final class BackpackModel extends Model<Float> {
         PartDefinition root = mesh.getRoot();
 
         CubeListBuilder roll = CubeListBuilder.create().texOffs(32, 48)
-                .addBox(-4.2F, -0.4F, 2.2F, 8.4F, 0.75F, 3.3F)
-                .addBox(-4.45F, -0.3F, 2.3F, 0.35F, 0.6F, 3.1F)
-                .addBox(4.1F, -0.3F, 2.3F, 0.35F, 0.6F, 3.1F)
-                .addBox(-2.8F, -0.45F, 2.15F, 0.5F, 0.85F, 3.4F)
-                .addBox(2.3F, -0.45F, 2.15F, 0.5F, 0.85F, 3.4F);
+                .addBox(-3.4F, 0.15F, 2.2F, 6.8F, 0.6F, 2.7F)
+                .addBox(-3.65F, 0.2F, 2.3F, 0.3F, 0.5F, 2.5F)
+                .addBox(3.35F, 0.2F, 2.3F, 0.3F, 0.5F, 2.5F)
+                .addBox(-2.2F, 0.1F, 2.15F, 0.4F, 0.7F, 2.8F)
+                .addBox(1.8F, 0.1F, 2.15F, 0.4F, 0.7F, 2.8F);
 
         root.addOrReplaceChild("bedroll", roll, PartPose.ZERO);
         return new BackpackModel(LayerDefinition.create(mesh, 64, 64).bakeRoot());

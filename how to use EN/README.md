@@ -27,7 +27,7 @@ compression straps, emblem, bedroll, pads and a lock — the higher the tier, th
 
 ### Server (admin)
 
-1. Put `Backpacks-2.0.0.jar` into `plugins/`.
+1. Put `Backpacks-2.0.1.jar` into `plugins/`.
 2. Start the server. On first start it creates:
    - `plugins/Backpacks/config.yml` — settings;
    - `plugins/Backpacks/messages.yml` — RU/EN texts;
@@ -37,7 +37,7 @@ compression straps, emblem, bedroll, pads and a lock — the higher the tier, th
 ### Client (for the 3D model and the inventory slot)
 
 1. Install Fabric Loader 0.20.1+ for Minecraft 26.3 and Fabric API.
-2. Put `backpacks-mod-2.0.0.jar` into `mods/`.
+2. Put `backpacks-mod-2.0.1.jar` into `mods/`.
 3. Launch the game and join the server.
 
 The mod is client-side only: without the server plugin it does nothing.
@@ -61,10 +61,10 @@ The mod is client-side only: without the server plugin it does nothing.
 | Open the equipped backpack | Right-click with an empty hand, `/bp` | Open key (default **B**), right-click the backpack slot, right-click with an empty hand, `/bp` |
 | Open a backpack in hand | Right-click the backpack | Right-click the backpack |
 | Equip | Right-click a backpack in your own inventory, Shift+right-click in hand, `/bp equip` | Left-click the backpack slot, right-click a backpack in your inventory |
-| Unequip | Shift+right-click with an empty hand, `/bp unequip` | Left-click the backpack slot, Shift+right-click with an empty hand, `/bp unequip` |
+| Unequip | Shift+right-click with an empty hand, `/bp unequip` | Left-click the backpack slot, **Shift + open key**, Shift+right-click with an empty hand, `/bp unequip` |
 | Take the worn backpack to the cursor | — | Left-click the backpack slot with an empty cursor |
 | Put a backpack from the cursor into the slot | — | Left-click the slot with a backpack on the cursor (replaces the worn one) |
-| Take an item from the backpack into your hand | — | **Middle-click** it in the backpack window; pick-block (MMB) in the world also finds items inside the equipped backpack |
+| Take an item from the backpack into your hand | — | **Middle-click** it in the backpack window (a stack, or everything left when it is smaller); pick-block (MMB) in the world also finds items inside the equipped backpack |
 
 The open key can be changed in **Options → Controls → Backpacks**
 (`key.backpacks.open`). The item lore and messages always show the key that is actually
@@ -86,9 +86,12 @@ right-clicking a jukebox with a backpack opens the backpack instead of playing t
   onward up to **27 stacks** of the same item.
 - **LMB** — take/put a stack, **RMB** — one item, **Shift+LMB** on a cell — take everything
   from it, **Shift+LMB** on an item in your inventory — put it into the backpack.
-- **MMB** on a cell — take a stack from the backpack into your inventory and hand. The same
-  works in the world: pick-block (MMB) on a block or mob finds the item in the equipped
-  backpack.
+- Chest shortcuts work too: **number keys 1–9** swap a cell with that hotbar slot, **Q**
+  drops one item, **Ctrl+Q** drops the stack, **double-click** collects matching items,
+  and **dragging** distributes items.
+- **MMB** on a cell — take a stack from the backpack into your hand, or everything left
+  when there is less than a stack. The same works in the world: pick-block (MMB) on a
+  block or mob finds the item in the equipped backpack.
 - A backpack cannot be placed inside another backpack.
 - The window shows the tier name, the number of cells, the total item count in a bulk cell
   and click hints; the cursor is rendered from server snapshots, so an item is never lost

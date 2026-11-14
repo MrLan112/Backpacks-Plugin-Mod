@@ -230,6 +230,13 @@ public final class BackpackGuiManager implements Listener {
             plugin.modBridge().sendGuiOpen(player, session.sessionId, tier.number(), tier.capacity(),
                     tier.bodyColor(), tier.accentColor(), tier.name(plugin.msg().russian()));
             sendData(session);
+            // The client installs the screen in the same tick; resend once afterwards so
+            // a payload that raced ahead of gui_open is always replaced by a fresh state.
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                if (sessions.get(player.getUniqueId()) == session) {
+                    sendData(session);
+                }
+            }, 2L);
         } else {
             session.inventory = Bukkit.createInventory(session, SIZE, plugin.msg().component("gui-title",
                     "tier", tier.name(plugin.msg().russian()),
@@ -1120,7 +1127,8 @@ public final class BackpackGuiManager implements Listener {
 
     // ------------------------------------------------------------ custom clicks
 
-    public void handleGuiClick(Player player, int sessionId, int area, int slot, int button, boolean shift) {
+    public void handleGuiClick(Player player, int sessionId, int area, int slot, int button,
+                               boolean shift, boolean control, boolean doubleClick) {
         if (player == null || !player.isOnline()) {
             return;
         }
@@ -1132,17 +1140,59 @@ public final class BackpackGuiManager implements Listener {
             return;
         }
 
-        switch (area) {
-            case 0 -> clickBackpack(session, slot, button, shift);
-            case 1 -> clickInventory(session, slot, button, shift);
-            case 2 -> clickOutside(session, button);
-            default -> {
-                return;
+        if (doubleClick && button == 0 && !session.player.getItemOnCursor().getType().isAir()) {
+            // Vanilla double-click: pull every matching stack onto the cursor.
+            collect(session, player);
+        } else {
+            switch (area) {
+                case 0 -> clickBackpack(session, slot, button, shift);
+                case 1 -> clickInventory(session, slot, button, shift);
+                case 2 -> clickOutside(session, button);
+                default -> {
+                    return;
+                }
             }
         }
         markDirty(session);
         sound(player, "sound-click", 0.5f, 1.6f);
         sendData(session);
+    }
+
+    /** Keyboard shortcuts: 1-9 hotbar swap and Q / Ctrl+Q drop, like a chest. */
+    public void handleGuiKey(Player player, int sessionId, int area, int slot, int hotbar,
+                             int action, boolean shift, boolean control) {
+        if (player == null || !player.isOnline()) {
+            return;
+        }
+        Session session = sessions.get(player.getUniqueId());
+        if (session == null || !session.custom || session.sessionId != sessionId) {
+            return;
+        }
+        if (session.player != player) {
+            return;
+        }
+
+        if (action == 0) {
+            swapWithHotbar(session, area, slot, hotbar);
+        } else if (action == 1) {
+            dropFrom(session, area, slot, control);
+        } else {
+            return;
+        }
+        markDirty(session);
+        sound(player, "sound-click", 0.5f, 1.6f);
+        sendData(session);
+    }
+
+    /** A freshly installed client screen asks for the current contents. */
+    public void handleGuiRequest(Player player, int sessionId) {
+        if (player == null || !player.isOnline()) {
+            return;
+        }
+        Session session = sessions.get(player.getUniqueId());
+        if (session != null && session.custom && session.sessionId == sessionId) {
+            sendData(session);
+        }
     }
 
     public void handleGuiClosed(Player player, int sessionId) {
@@ -1287,7 +1337,169 @@ public final class BackpackGuiManager implements Listener {
         }
     }
 
-    /** MMB on a backpack cell: move one stack from the backpack into the hand/inventory. */
+    /** 1-9 while hovering: swap the hovered slot with that hotbar slot, like a chest. */
+    private void swapWithHotbar(Session session, int area, int slot, int hotbar) {
+        if (hotbar < 0 || hotbar > 8) {
+            return;
+        }
+        Player player = session.player;
+        PlayerInventory inventory = player.getInventory();
+        if (area == 0) {
+            if (slot < 0 || slot >= session.contents.length || slot >= session.tier.capacity()) {
+                return;
+            }
+            ItemStack hot = inventory.getItem(hotbar);
+            boolean hotEmpty = hot == null || hot.getType().isAir();
+            if (!hotEmpty && isBackpack(hot)) {
+                return;
+            }
+            Cell cell = session.contents[slot];
+            if (cell != null && isBackpack(cell.proto)) {
+                return;
+            }
+            if (cell == null) {
+                if (hotEmpty) {
+                    return;
+                }
+                Cell created = new Cell();
+                created.proto = hot.clone();
+                created.proto.setAmount(1);
+                created.count = hot.getAmount();
+                session.contents[slot] = created;
+                inventory.setItem(hotbar, null);
+                return;
+            }
+            int max = cell.maxStack();
+            if (cell.count > max) {
+                // Bulk cell: only a full stack can leave it, and only into an empty slot.
+                if (!hotEmpty) {
+                    return;
+                }
+                ItemStack out = cell.proto.clone();
+                out.setAmount(max);
+                inventory.setItem(hotbar, out);
+                cell.count -= max;
+                if (cell.count <= 0) {
+                    session.contents[slot] = null;
+                }
+                return;
+            }
+            ItemStack cellStack = cell.proto.clone();
+            cellStack.setAmount(cell.count);
+            if (hotEmpty) {
+                session.contents[slot] = null;
+            } else {
+                Cell created = new Cell();
+                created.proto = hot.clone();
+                created.proto.setAmount(1);
+                created.count = hot.getAmount();
+                session.contents[slot] = created;
+            }
+            inventory.setItem(hotbar, cellStack);
+            return;
+        }
+        if (area == 1) {
+            if (slot < 0 || slot >= 36 || slot == hotbar) {
+                return;
+            }
+            ItemStack hot = inventory.getItem(hotbar);
+            ItemStack current = inventory.getItem(slot);
+            inventory.setItem(hotbar, current);
+            inventory.setItem(slot, hot);
+        }
+    }
+
+    /** Q / Ctrl+Q: drop one item or a whole stack, like a chest. */
+    private void dropFrom(Session session, int area, int slot, boolean control) {
+        Player player = session.player;
+        ItemStack cursor = player.getItemOnCursor();
+        if (cursor != null && !cursor.getType().isAir()) {
+            // With a stack on the cursor Q always drops that stack, whatever is hovered.
+            int amount = control ? cursor.getAmount() : 1;
+            drop(player, cursor, amount);
+            player.setItemOnCursor(cursor.getAmount() - amount <= 0
+                    ? new ItemStack(Material.AIR)
+                    : cursor.asQuantity(cursor.getAmount() - amount));
+            return;
+        }
+        if (area == 0) {
+            if (slot < 0 || slot >= session.contents.length) {
+                return;
+            }
+            Cell cell = session.contents[slot];
+            if (cell == null || cell.count <= 0) {
+                return;
+            }
+            int amount = control ? Math.min(cell.count, cell.maxStack()) : 1;
+            drop(player, cell.proto, amount);
+            cell.count -= amount;
+            if (cell.count <= 0) {
+                session.contents[slot] = null;
+            }
+            return;
+        }
+        if (area == 1) {
+            if (slot < 0 || slot >= 36) {
+                return;
+            }
+            PlayerInventory inventory = player.getInventory();
+            ItemStack stack = inventory.getItem(slot);
+            if (stack == null || stack.getType().isAir()) {
+                return;
+            }
+            int amount = control ? stack.getAmount() : 1;
+            drop(player, stack, amount);
+            stack.setAmount(stack.getAmount() - amount);
+            inventory.setItem(slot, stack.getAmount() <= 0 ? null : stack);
+            return;
+        }
+    }
+
+    private static void drop(Player player, ItemStack prototype, int amount) {
+        ItemStack stack = prototype.clone();
+        stack.setAmount(Math.max(1, amount));
+        player.getWorld().dropItemNaturally(player.getLocation(), stack);
+    }
+
+    /** Double-click: pull every matching stack from the backpack and inventory to the cursor. */
+    private void collect(Session session, Player player) {
+        ItemStack cursor = player.getItemOnCursor();
+        if (cursor == null || cursor.getType().isAir()) {
+            return;
+        }
+        int max = Math.max(1, cursor.getType().getMaxStackSize());
+        int want = max - cursor.getAmount();
+        if (want <= 0) {
+            return;
+        }
+        for (int i = 0; i < session.contents.length && want > 0; i++) {
+            Cell cell = session.contents[i];
+            if (cell == null || cell.count <= 0 || !cell.proto.isSimilar(cursor)) {
+                continue;
+            }
+            int take = Math.min(want, cell.count);
+            cell.count -= take;
+            want -= take;
+            if (cell.count <= 0) {
+                session.contents[i] = null;
+            }
+        }
+        PlayerInventory inventory = player.getInventory();
+        for (int i = 0; i < 36 && want > 0; i++) {
+            ItemStack stack = inventory.getItem(i);
+            if (stack == null || stack.getType().isAir() || !stack.isSimilar(cursor)) {
+                continue;
+            }
+            int take = Math.min(want, stack.getAmount());
+            stack.setAmount(stack.getAmount() - take);
+            inventory.setItem(i, stack.getAmount() <= 0 ? null : stack);
+            want -= take;
+        }
+        cursor.setAmount(max - want);
+        player.setItemOnCursor(cursor);
+    }
+
+    /** MMB on a backpack cell: put a stack (or everything left) straight into the hand. */
     private void pickFromCell(Session session, int index, Player player) {
         Cell cell = session.contents[index];
         if (cell == null || cell.count <= 0) {
@@ -1296,17 +1508,60 @@ public final class BackpackGuiManager implements Listener {
         int amount = Math.min(cell.count, cell.maxStack());
         ItemStack picked = cell.proto.clone();
         picked.setAmount(amount);
-        int moved = addToInventory(player, picked);
-        if (moved <= 0) {
-            plugin.msg().send(player, "inventory-full");
-            return;
+
+        PlayerInventory inventory = player.getInventory();
+        int target = handTarget(inventory, picked);
+        int moved;
+        if (target >= 0) {
+            ItemStack slot = inventory.getItem(target);
+            int room = slot == null || slot.getType().isAir()
+                    ? picked.getType().getMaxStackSize()
+                    : Math.max(0, slot.getType().getMaxStackSize() - slot.getAmount());
+            moved = Math.min(amount, room);
+            if (slot == null || slot.getType().isAir()) {
+                ItemStack placed = picked.clone();
+                placed.setAmount(moved);
+                inventory.setItem(target, placed);
+            } else {
+                slot.setAmount(slot.getAmount() + moved);
+                inventory.setItem(target, slot);
+            }
+            inventory.setHeldItemSlot(target);
+        } else {
+            moved = addToInventory(player, picked);
+            if (moved <= 0) {
+                plugin.msg().send(player, "inventory-full");
+                return;
+            }
         }
         cell.count -= moved;
         if (cell.count <= 0) {
             session.contents[index] = null;
         }
-        selectHotbar(player, picked);
         sound(player, "sound-click", 0.7f, 1.2f);
+    }
+
+    /** First hotbar slot that already holds the item, then the selected slot, then an empty one. */
+    private static int handTarget(PlayerInventory inventory, ItemStack wanted) {
+        for (int slot = 0; slot < 9; slot++) {
+            ItemStack item = inventory.getItem(slot);
+            if (item != null && !item.getType().isAir() && item.isSimilar(wanted)
+                    && item.getAmount() < item.getType().getMaxStackSize()) {
+                return slot;
+            }
+        }
+        int held = inventory.getHeldItemSlot();
+        ItemStack selected = inventory.getItem(held);
+        if (selected == null || selected.getType().isAir()) {
+            return held;
+        }
+        for (int slot = 0; slot < 9; slot++) {
+            ItemStack item = inventory.getItem(slot);
+            if (item == null || item.getType().isAir()) {
+                return slot;
+            }
+        }
+        return -1;
     }
 
     /** MMB on a player inventory slot: move that stack into the selected hotbar slot. */

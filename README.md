@@ -44,7 +44,7 @@ Wearable, upgradeable backpacks for **Purpur/Paper 26.3**, with an optional **Fa
 
 ### Server
 
-1. Download `Backpacks-2.0.0.jar` from [Releases](https://github.com/MrLan112/Backpacks-Plugin-Mod/releases) and put it into `plugins/`.
+1. Download `Backpacks-2.0.1.jar` from [Releases](https://github.com/MrLan112/Backpacks-Plugin-Mod/releases) and put it into `plugins/`.
 2. Start the server. On first start the plugin creates:
    - `plugins/Backpacks/config.yml`
    - `plugins/Backpacks/messages.yml`
@@ -54,7 +54,7 @@ Wearable, upgradeable backpacks for **Purpur/Paper 26.3**, with an optional **Fa
 ### Client (for the 3D model, inventory slot and hotkey)
 
 1. Install Fabric Loader 0.20.1+ for Minecraft 26.3 and Fabric API.
-2. Download `backpacks-mod-2.0.0.jar` from [Releases](https://github.com/MrLan112/Backpacks-Plugin-Mod/releases) and put it into `.minecraft/mods/`.
+2. Download `backpacks-mod-2.0.1.jar` from [Releases](https://github.com/MrLan112/Backpacks-Plugin-Mod/releases) and put it into `.minecraft/mods/`.
 3. Launch the game and join the server.
 
 Without the mod the plugin still works (commands, inventory right-click, empty-hand right-click, `/bp`), but the backpack item uses the plain fallback model, the inventory slot and the one-screen GUI are not available.
@@ -66,14 +66,14 @@ Without the mod the plugin still works (commands, inventory right-click, empty-h
 | Open the equipped backpack | Right-click with an empty hand, `/bp` | Open key (default **B**), right-click the backpack slot, right-click with an empty hand, `/bp` |
 | Open a backpack in hand | Right-click the backpack | Right-click the backpack |
 | Equip | Right-click a backpack in your own inventory, **Shift + right-click** a backpack in hand, `/bp equip` | **Left-click** the backpack slot, or right-click a backpack in your inventory |
-| Unequip | **Shift + right-click** with an empty hand, `/bp unequip` | **Left-click** the backpack slot, **Shift + right-click** with an empty hand, `/bp unequip` |
+| Unequip | **Shift + right-click** with an empty hand, `/bp unequip` | **Left-click** the backpack slot, **Shift + open key**, **Shift + right-click** with an empty hand, `/bp unequip` |
 | Take the worn backpack to the cursor | — | **Left-click** the backpack slot with an empty cursor |
 | Put a backpack from the cursor into the slot | — | **Left-click** the slot with a backpack on the cursor (replaces the worn one) |
-| Take an item from the backpack into your hand | — | **Middle-click** it in the backpack GUI; pick-block (MMB) in the world also finds items inside the equipped backpack |
+| Take an item from the backpack into your hand | — | **Middle-click** it in the backpack GUI (one stack, or everything left when less than a stack); pick-block (MMB) in the world also finds items inside the equipped backpack |
 
 The open key can be changed in **Options → Controls → Backpacks**. The item lore and messages always show the key that is actually bound. `F` opens the backpack only when `hotkey: SWAP_HANDS` is set in the config; the default is `NONE`, because the mod key, the backpack slot and `/bp` already cover it.
 
-Without the mod the backpack window is a regular chest GUI with pages. With the mod the whole backpack fits on one screen: tiers up to 256 slots are scaled down instead of being split into pages. Left/right click, shift-click and the cursor work like a chest; middle-click takes a stack out of the backpack.
+Without the mod the backpack window is a regular chest GUI with pages. With the mod the whole backpack fits on one screen: tiers up to 256 slots are scaled down instead of being split into pages. Left/right click, shift-click, number keys (swap with a hotbar slot), **Q / Ctrl+Q** (drop one / the stack), double-click (collect matching stacks) and dragging work like a chest; middle-click takes a stack out of the backpack, or everything left when it is smaller than a stack.
 
 Backpacks cannot be put on a horse (legacy stacks) or placed in an item frame, and right-clicking a jukebox with a backpack opens the backpack instead of playing the disc.
 
@@ -186,8 +186,8 @@ gradlew.bat build
 
 Output:
 
-- `plugin/build/libs/Backpacks-2.0.0.jar` — server plugin (SQLite driver shaded in)
-- `mod/build/libs/backpacks-mod-2.0.0.jar` — Fabric client mod
+- `plugin/build/libs/Backpacks-2.0.1.jar` — server plugin (SQLite driver shaded in)
+- `mod/build/libs/backpacks-mod-2.0.1.jar` — Fabric client mod
 
 The Gradle wrapper downloads Gradle 9.9.1 automatically. The mod's models, item definitions and textures can be regenerated with Python 3 and Pillow:
 
@@ -224,9 +224,9 @@ python tools/gen_backpacks.py mod/src/main/resources
 - **17 тиров**: от «Льняного мешочка» на 9 ячеек до «Абсолютного рюкзака» на 256 ячеек.
 - **Цепочка крафта**: каждый тир крафтится из рюкзака предыдущего тира и материалов; содержимое и UUID сохраняются при улучшении. Все рецепты видны в книге рецептов.
 - **Ячейки-стаки**: с 9-го тира одна ячейка вмещает до **27 стаков** одного предмета.
-- **Надевание без команд**: ЛКМ по слоту рюкзака в инвентаре (с модом), ПКМ по рюкзаку в инвентаре или Shift+ПКМ рюкзаком в руке; снятие — ЛКМ по слоту, Shift+ПКМ пустой рукой или `/bp unequip`.
-- **Одно окно с модом**: весь рюкзак виден сразу, без страниц; большие тиры до 256 ячеек автоматически уменьшаются. Без мода — обычный сундук со страницами.
-- **СКМ**: средний клик по предмету в рюкзаке забирает стак в инвентарь и руку; pick-block в мире тоже ищет предмет в надетом рюкзаке.
+- **Надевание без команд**: ЛКМ по слоту рюкзака в инвентаре (с модом), ПКМ по рюкзаку в инвентаре или Shift+ПКМ рюкзаком в руке; снятие — ЛКМ по слоту, **Shift+клавиша открытия**, Shift+ПКМ пустой рукой или `/bp unequip`.
+- **Одно окно с модом**: весь рюкзак виден сразу, без страниц; большие тиры до 256 ячеек автоматически уменьшаются. Без мода — обычный сундук со страницами. Работают привычные приёмы сундука: Shift+ЛКМ, цифры 1–9 (обмен с хотбаром), Q / Ctrl+Q, двойной клик и перетаскивание.
+- **СКМ**: средний клик по предмету в рюкзаке забирает в руку стак, а если предметов меньше стака — всё, что осталось; pick-block в мире тоже ищет предмет в надетом рюкзаке.
 - **Детальные модели**: у каждого тира своя текстура 64×64 и модель на 22–44 элемента — боковые карманы (3+), металлические уголки (4+), стяжки (6+), эмблема (8+), усилители (10+), скатка (12+), плечевые подушки (14+), замок (15+) и звезда на 17-м тире. Свечения у рюкзаков нет.
 - **Хранение**: SQLite по UUID предмета, содержимое не теряется при улучшении и перезапуске; есть защита от перезаписи и повреждения данных.
 - **RU + EN**: сообщения и лор предметов, клавиша в лоре берётся из настроек клиента.
@@ -234,7 +234,7 @@ python tools/gen_backpacks.py mod/src/main/resources
 
 **Подробные инструкции:** [Как пользоваться — Русский](how%20to%20use%20RU/README.md) · [How to use — English](how%20to%20use%20EN/README.md)
 
-**Установка:** `Backpacks-2.0.0.jar` → `plugins/`, `backpacks-mod-2.0.0.jar` → `mods/` клиента (Fabric).
+**Установка:** `Backpacks-2.0.1.jar` → `plugins/`, `backpacks-mod-2.0.1.jar` → `mods/` клиента (Fabric).
 
 **Сборка из исходников:** нужен JDK 25; в папке `Backpacks` выполните `gradlew.bat build` (Windows) или `./gradlew build`.
 

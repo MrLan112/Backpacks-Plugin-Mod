@@ -50,6 +50,10 @@ ATLAS = {
 
 TEXTURE_KEYS = list(ATLAS.keys())
 
+# The PNG is 64x64, while model UVs always use the 0-16 texture unit space
+# (16 units span the whole texture, no matter how many pixels it has).
+ATLAS_SCALE = 4.0
+
 
 def clamp(value):
     return max(0, min(255, int(round(value))))
@@ -215,7 +219,13 @@ def faces_for(material, w, h, d):
 
     def rect(u0, v0, ww, hh):
         scale = min(1.0, (rw - 3.0) / max(ww, 1.0), (rh - 3.0) / max(hh, 1.0))
-        return [round(u0, 2), round(v0, 2), round(u0 + ww * scale, 2), round(v0 + hh * scale, 2)]
+        # Pixel coordinates of the atlas region become 0-16 model texture units.
+        return [
+            round(min(16.0, max(0.0, u0 / ATLAS_SCALE)), 3),
+            round(min(16.0, max(0.0, v0 / ATLAS_SCALE)), 3),
+            round(min(16.0, max(0.0, (u0 + ww * scale) / ATLAS_SCALE)), 3),
+            round(min(16.0, max(0.0, (v0 + hh * scale) / ATLAS_SCALE)), 3),
+        ]
 
     return {
         "north": {"uv": rect(rx + 1, ry + 1, w, h), "texture": "#" + material},

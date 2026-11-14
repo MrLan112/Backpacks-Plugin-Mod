@@ -1,5 +1,6 @@
 package ru.backpacks.mod;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -17,7 +18,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemLore;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * One-screen backpack GUI for modded clients. The server owns the contents, the
@@ -64,6 +67,20 @@ public final class BackpackScreen extends Screen {
     private float originY;
     private boolean closed;
 
+    /**
+     * The server sends {@code gui_data} right after {@code gui_open}. Depending on
+     * packet scheduling the data can be handled before the new screen is installed,
+     * so it is cached here and applied by the screen constructor.
+     */
+    private static volatile BackpackSignals.GuiData pendingData;
+
+    private int lastMouseX;
+    private int lastMouseY;
+
+    /** Slot drag: one item is moved into every newly entered slot. */
+    private boolean dragging;
+    private final Set<Long> dragVisited = new HashSet<>();
+
     private BackpackScreen(BackpackSignals.GuiOpen payload) {
         super(Component.empty());
         this.sessionId = payload.sessionId();
@@ -73,6 +90,11 @@ public final class BackpackScreen extends Screen {
         this.heading = Component.literal(payload.title()).withStyle(ChatFormatting.GOLD);
         this.capacity = Math.max(1, payload.capacity());
         computeSize();
+        BackpackSignals.GuiData cached = pendingData;
+        if (cached != null && cached.sessionId() == sessionId) {
+            pendingData = null;
+            apply(cached);
+        }
     }
 
     // ------------------------------------------------------------- lifecycle
@@ -89,14 +111,23 @@ public final class BackpackScreen extends Screen {
     public static void applyData(BackpackSignals.GuiData data) {
         Screen current = Minecraft.getInstance().gui.screen();
         if (current instanceof BackpackScreen screen && screen.sessionId == data.sessionId()) {
+            pendingData = null;
             screen.apply(data);
+            return;
         }
+        // The screen is not installed yet (or the data raced ahead of gui_open).
+        // Keep the payload; the constructor picks it up for the matching session.
+        pendingData = data;
     }
 
     /** The server closed the GUI (logout, death, another backpack opened). */
     public static void close(int sessionId) {
         Minecraft minecraft = Minecraft.getInstance();
         Screen current = minecraft.gui.screen();
+        BackpackSignals.GuiData cached = pendingData;
+        if (cached != null && cached.sessionId() == sessionId) {
+            pendingData = null;
+        }
         if (current instanceof BackpackScreen screen && screen.sessionId == sessionId) {
             screen.closed = true;
             minecraft.setScreenAndShow(null);
@@ -125,6 +156,9 @@ public final class BackpackScreen extends Screen {
     @Override
     protected void init() {
         layout();
+        // Ask for a fresh snapshot once the screen is really installed; this also
+        // recovers from a gui_data payload that arrived before the screen existed.
+        send(new BackpackSignals.GuiRequest(sessionId));
     }
 
     private void layout() {
@@ -152,6 +186,8 @@ public final class BackpackScreen extends Screen {
     @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         layout();
+        lastMouseX = mouseX;
+        lastMouseY = mouseY;
         Hover hover = hover(mouseX, mouseY);
         var pose = graphics.pose();
         pose.pushMatrix();
@@ -348,27 +384,96 @@ public final class BackpackScreen extends Screen {
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        int button = event.button();
-        if (button < 0 || button > 2) {
+        // 26.3 numbers mouse buttons as 1 = LMB, 2 = MMB, 3 = RMB. The payload and
+        // the server use the classic 0 = LMB, 1 = RMB, 2 = MMB layout.
+        int button = logicalButton(event.button());
+        if (button < 0) {
             return super.mouseClicked(event, doubleClick);
         }
         Hover hover = hover((int) event.x(), (int) event.y());
         if (hover.area() < 0) {
-            if (cursor.isEmpty()) {
+            dragging = false;
+            if (cursor.isEmpty() && !doubleClick) {
                 return true;
             }
-            send(new BackpackSignals.GuiClick(sessionId, 2, 0, button, event.hasShiftDown()));
+            send(new BackpackSignals.GuiClick(sessionId, 2, 0, button, event.hasShiftDown(),
+                    event.hasControlDown(), doubleClick));
             return true;
         }
+        if (button == 2) {
+            dragging = false;
+        } else if (!cursor.isEmpty() && button == 0) {
+            // Vanilla puts one item into every slot the cursor is dragged across.
+            dragging = true;
+            dragVisited.clear();
+            dragVisited.add(slotKey(hover));
+        } else {
+            dragging = false;
+        }
         send(new BackpackSignals.GuiClick(sessionId, hover.area(), hover.slot(), button,
-                event.hasShiftDown()));
+                event.hasShiftDown(), event.hasControlDown(), doubleClick));
         return true;
+    }
+
+    @Override
+    public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
+        boolean handled = super.mouseDragged(event, dx, dy);
+        if (!dragging || cursor.isEmpty()) {
+            return handled;
+        }
+        Hover hover = hover((int) event.x(), (int) event.y());
+        if (hover.area() < 0) {
+            return true;
+        }
+        if (dragVisited.add(slotKey(hover))) {
+            // RMB places exactly one item per slot; repeating it across the visited
+            // slots reproduces the vanilla drag distribution closely enough.
+            send(new BackpackSignals.GuiClick(sessionId, hover.area(), hover.slot(), 1,
+                    event.hasShiftDown(), false, false));
+        }
+        return true;
+    }
+
+    @Override
+    public boolean mouseReleased(MouseButtonEvent event) {
+        dragging = false;
+        dragVisited.clear();
+        return super.mouseReleased(event);
+    }
+
+    private static long slotKey(Hover hover) {
+        return ((long) hover.area() << 32) | (hover.slot() & 0xFFFFFFFFL);
+    }
+
+    private static int logicalButton(int raw) {
+        return switch (raw) {
+            case 1 -> 0; // LMB
+            case 3 -> 1; // RMB
+            case 2 -> 2; // MMB
+            default -> -1;
+        };
     }
 
     @Override
     public boolean keyPressed(KeyEvent event) {
         if (event.isEscape() || minecraft.options.keyInventory.matches(event)) {
             close(true);
+            return true;
+        }
+        Hover hover = hover(lastMouseX, lastMouseY);
+        // Q / Ctrl+Q: drop one item or the whole stack, like a chest.
+        if (minecraft.options.keyDrop.matches(event)) {
+            send(new BackpackSignals.GuiKey(sessionId, hover.area(), hover.slot(), -1,
+                    BackpackSignals.GuiKey.ACTION_DROP, event.hasShiftDown(),
+                    event.hasControlDown()));
+            return true;
+        }
+        // 1-9: swap the hovered slot with that hotbar slot.
+        int key = event.key();
+        if (key >= InputConstants.KEY_1 && key <= InputConstants.KEY_9 && hover.area() >= 0) {
+            send(new BackpackSignals.GuiKey(sessionId, hover.area(), hover.slot(),
+                    key - InputConstants.KEY_1, BackpackSignals.GuiKey.ACTION_HOTBAR,
+                    event.hasShiftDown(), event.hasControlDown()));
             return true;
         }
         return super.keyPressed(event);

@@ -42,6 +42,21 @@ public final class BackpackSignals {
     }
 
     /**
+     * Shift + open key: take the worn backpack off and put it into the inventory.
+     * The server already understands {@code backpacks:unequip} since 1.0.0.
+     */
+    public record Unequip() implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<Unequip> TYPE = payloadType("unequip");
+        public static final StreamCodec<FriendlyByteBuf, Unequip> CODEC =
+                StreamCodec.unit(new Unequip());
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
+    /**
      * Sent once after joining. Older mod builds send this payload with no body,
      * so the server treats a missing body as protocol 0.
      */
@@ -206,10 +221,12 @@ public final class BackpackSignals {
     /**
      * Click inside the custom GUI. {@code area}: 0 = backpack grid,
      * 1 = player inventory, 2 = outside the window. {@code button}: 0 = LMB,
-     * 1 = RMB, 2 = MMB (pick item).
+     * 1 = RMB, 2 = MMB (pick item). {@code doubleClick} is the vanilla
+     * double-click collect shortcut; {@code control} is Ctrl.
      */
     public record GuiClick(int sessionId, int area, int slot, int button,
-                           boolean shift) implements CustomPacketPayload {
+                           boolean shift, boolean control, boolean doubleClick)
+            implements CustomPacketPayload {
         public static final CustomPacketPayload.Type<GuiClick> TYPE = payloadType("gui_click");
         public static final StreamCodec<FriendlyByteBuf, GuiClick> CODEC = StreamCodec.of(
                 (buf, payload) -> {
@@ -218,9 +235,39 @@ public final class BackpackSignals {
                     buf.writeInt(payload.slot());
                     buf.writeInt(payload.button());
                     buf.writeBoolean(payload.shift());
+                    buf.writeBoolean(payload.control());
+                    buf.writeBoolean(payload.doubleClick());
                 },
                 buf -> new GuiClick(buf.readInt(), buf.readInt(), buf.readInt(), buf.readInt(),
-                        buf.readBoolean()));
+                        buf.readBoolean(), buf.readBoolean(), buf.readBoolean()));
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
+    /**
+     * Keyboard shortcut inside the custom GUI. {@code action}: 0 = hotbar swap
+     * ({@code hotbar} is 0-8), 1 = drop (Q / Ctrl+Q).
+     */
+    public record GuiKey(int sessionId, int area, int slot, int hotbar, int action,
+                         boolean shift, boolean control) implements CustomPacketPayload {
+        public static final int ACTION_HOTBAR = 0;
+        public static final int ACTION_DROP = 1;
+        public static final CustomPacketPayload.Type<GuiKey> TYPE = payloadType("gui_key");
+        public static final StreamCodec<FriendlyByteBuf, GuiKey> CODEC = StreamCodec.of(
+                (buf, payload) -> {
+                    buf.writeInt(payload.sessionId());
+                    buf.writeInt(payload.area());
+                    buf.writeInt(payload.slot());
+                    buf.writeInt(payload.hotbar());
+                    buf.writeInt(payload.action());
+                    buf.writeBoolean(payload.shift());
+                    buf.writeBoolean(payload.control());
+                },
+                buf -> new GuiKey(buf.readInt(), buf.readInt(), buf.readInt(), buf.readInt(),
+                        buf.readInt(), buf.readBoolean(), buf.readBoolean()));
 
         @Override
         public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
@@ -234,6 +281,23 @@ public final class BackpackSignals {
         public static final StreamCodec<FriendlyByteBuf, GuiClosed> CODEC = StreamCodec.of(
                 (buf, payload) -> buf.writeInt(payload.sessionId()),
                 buf -> new GuiClosed(buf.readInt()));
+
+        @Override
+        public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+            return TYPE;
+        }
+    }
+
+    /**
+     * Sent when the screen is installed. The server answers with a fresh
+     * {@code gui_data}, so a payload that raced ahead of {@code gui_open} can never
+     * leave the window empty.
+     */
+    public record GuiRequest(int sessionId) implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<GuiRequest> TYPE = payloadType("gui_request");
+        public static final StreamCodec<FriendlyByteBuf, GuiRequest> CODEC = StreamCodec.of(
+                (buf, payload) -> buf.writeInt(payload.sessionId()),
+                buf -> new GuiRequest(buf.readInt()));
 
         @Override
         public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {

@@ -107,9 +107,15 @@ public final class BackpackItems {
             meta.setMaxStackSize(1);
             meta.setRarity(tier.rarity());
             // No glint: the tier gradient in the name already separates the tiers,
-            // and a glowing backpack looked like an enchanted item.
+            // and a glowing backpack looked like an enchanted item. Legacy backpacks
+            // were armour and could carry enchantments, so strip those as well.
+            for (org.bukkit.enchantments.Enchantment enchantment
+                    : new ArrayList<>(meta.getEnchants().keySet())) {
+                meta.removeEnchant(enchantment);
+            }
             meta.setEnchantmentGlintOverride(false);
-            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS,
+                    ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
 
             meta.getPersistentDataContainer().set(tierKey, PersistentDataType.STRING, tier.id());
             if (id == null) {

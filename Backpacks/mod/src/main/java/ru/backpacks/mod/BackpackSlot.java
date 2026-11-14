@@ -123,8 +123,15 @@ public final class BackpackSlot {
         if (event.x() < x || event.x() >= x + SIZE || event.y() < y || event.y() >= y + SIZE) {
             return true;
         }
-        if (event.button() == 0 || event.button() == 1) {
-            ClientPlayNetworking.send(new BackpackSignals.Slot(event.button()));
+        // 26.3 numbers mouse buttons as 1 = LMB, 2 = MMB, 3 = RMB (GLFW code + 1).
+        // The server payload keeps the classic 0 = LMB, 1 = RMB layout.
+        int logical = switch (event.button()) {
+            case 1 -> 0;
+            case 3 -> 1;
+            default -> -1;
+        };
+        if (logical >= 0) {
+            ClientPlayNetworking.send(new BackpackSignals.Slot(logical));
             return false;
         }
         return true;

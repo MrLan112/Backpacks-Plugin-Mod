@@ -19,11 +19,14 @@ public final class BackpacksMod implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         PayloadTypeRegistry.serverboundPlay().register(BackpackSignals.Open.TYPE, BackpackSignals.Open.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(BackpackSignals.Unequip.TYPE, BackpackSignals.Unequip.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(BackpackSignals.Hello.TYPE, BackpackSignals.Hello.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(BackpackSignals.Key.TYPE, BackpackSignals.Key.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(BackpackSignals.Slot.TYPE, BackpackSignals.Slot.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(BackpackSignals.GuiClick.TYPE, BackpackSignals.GuiClick.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(BackpackSignals.GuiKey.TYPE, BackpackSignals.GuiKey.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(BackpackSignals.GuiClosed.TYPE, BackpackSignals.GuiClosed.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(BackpackSignals.GuiRequest.TYPE, BackpackSignals.GuiRequest.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(BackpackSignals.Sync.TYPE, BackpackSignals.Sync.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(BackpackSignals.GuiOpen.TYPE, BackpackSignals.GuiOpen.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(BackpackSignals.GuiData.TYPE, BackpackSignals.GuiData.CODEC);
@@ -51,7 +54,9 @@ public final class BackpacksMod implements ClientModInitializer {
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (openKey.consumeClick()) {
-                send(new BackpackSignals.Open());
+                // Shift + open key takes the worn backpack off (restored 1.x shortcut).
+                boolean shift = client.options.keyShift.isDown();
+                send(shift ? new BackpackSignals.Unequip() : new BackpackSignals.Open());
             }
             sendKey();
         });

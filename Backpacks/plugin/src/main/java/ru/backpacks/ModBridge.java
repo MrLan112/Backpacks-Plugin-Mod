@@ -34,7 +34,9 @@ public final class ModBridge implements PluginMessageListener {
     public static final String CHANNEL_UNEQUIP = "backpacks:unequip";
     public static final String CHANNEL_SLOT = "backpacks:slot";
     public static final String CHANNEL_GUI_CLICK = "backpacks:gui_click";
+    public static final String CHANNEL_GUI_KEY = "backpacks:gui_key";
     public static final String CHANNEL_GUI_CLOSED = "backpacks:gui_closed";
+    public static final String CHANNEL_GUI_REQUEST = "backpacks:gui_request";
     public static final String CHANNEL_SYNC = "backpacks:sync";
     public static final String CHANNEL_GUI_OPEN = "backpacks:gui_open";
     public static final String CHANNEL_GUI_DATA = "backpacks:gui_data";
@@ -63,7 +65,9 @@ public final class ModBridge implements PluginMessageListener {
         Bukkit.getMessenger().registerIncomingPluginChannel(plugin, CHANNEL_UNEQUIP, this);
         Bukkit.getMessenger().registerIncomingPluginChannel(plugin, CHANNEL_SLOT, this);
         Bukkit.getMessenger().registerIncomingPluginChannel(plugin, CHANNEL_GUI_CLICK, this);
+        Bukkit.getMessenger().registerIncomingPluginChannel(plugin, CHANNEL_GUI_KEY, this);
         Bukkit.getMessenger().registerIncomingPluginChannel(plugin, CHANNEL_GUI_CLOSED, this);
+        Bukkit.getMessenger().registerIncomingPluginChannel(plugin, CHANNEL_GUI_REQUEST, this);
         Bukkit.getMessenger().registerOutgoingPluginChannel(plugin, CHANNEL_SYNC);
         Bukkit.getMessenger().registerOutgoingPluginChannel(plugin, CHANNEL_GUI_OPEN);
         Bukkit.getMessenger().registerOutgoingPluginChannel(plugin, CHANNEL_GUI_DATA);
@@ -78,7 +82,9 @@ public final class ModBridge implements PluginMessageListener {
         Bukkit.getMessenger().unregisterIncomingPluginChannel(plugin, CHANNEL_UNEQUIP, this);
         Bukkit.getMessenger().unregisterIncomingPluginChannel(plugin, CHANNEL_SLOT, this);
         Bukkit.getMessenger().unregisterIncomingPluginChannel(plugin, CHANNEL_GUI_CLICK, this);
+        Bukkit.getMessenger().unregisterIncomingPluginChannel(plugin, CHANNEL_GUI_KEY, this);
         Bukkit.getMessenger().unregisterIncomingPluginChannel(plugin, CHANNEL_GUI_CLOSED, this);
+        Bukkit.getMessenger().unregisterIncomingPluginChannel(plugin, CHANNEL_GUI_REQUEST, this);
         Bukkit.getMessenger().unregisterOutgoingPluginChannel(plugin, CHANNEL_SYNC);
         Bukkit.getMessenger().unregisterOutgoingPluginChannel(plugin, CHANNEL_GUI_OPEN);
         Bukkit.getMessenger().unregisterOutgoingPluginChannel(plugin, CHANNEL_GUI_DATA);
@@ -110,13 +116,31 @@ public final class ModBridge implements PluginMessageListener {
                 int slot = readInt(message, 8);
                 int button = readInt(message, 12);
                 boolean shift = message.length > 16 && message[16] != 0;
-                Bukkit.getScheduler().runTask(plugin,
-                        () -> plugin.gui().handleGuiClick(player, sessionId, area, slot, button, shift));
+                boolean control = message.length > 17 && message[17] != 0;
+                boolean doubleClick = message.length > 18 && message[18] != 0;
+                Bukkit.getScheduler().runTask(plugin, () -> plugin.gui().handleGuiClick(
+                        player, sessionId, area, slot, button, shift, control, doubleClick));
+            }
+            case CHANNEL_GUI_KEY -> {
+                int sessionId = readInt(message, 0);
+                int area = readInt(message, 4);
+                int slot = readInt(message, 8);
+                int hotbar = readInt(message, 12);
+                int action = readInt(message, 16);
+                boolean shift = message.length > 20 && message[20] != 0;
+                boolean control = message.length > 21 && message[21] != 0;
+                Bukkit.getScheduler().runTask(plugin, () -> plugin.gui().handleGuiKey(
+                        player, sessionId, area, slot, hotbar, action, shift, control));
             }
             case CHANNEL_GUI_CLOSED -> {
                 int sessionId = readInt(message, 0);
                 Bukkit.getScheduler().runTask(plugin,
                         () -> plugin.gui().handleGuiClosed(player, sessionId));
+            }
+            case CHANNEL_GUI_REQUEST -> {
+                int sessionId = readInt(message, 0);
+                Bukkit.getScheduler().runTask(plugin,
+                        () -> plugin.gui().handleGuiRequest(player, sessionId));
             }
             default -> {
                 // Unknown channel: nothing to do.
