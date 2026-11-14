@@ -19,13 +19,15 @@ the 9-slot *Linen Pouch* to the 256-slot *Ultimate Backpack*.
 | Client mod (optional) | Fabric Loader **0.20.1+**, Fabric API **0.166.2+26.3**, Minecraft **26.3** |
 
 The plugin works without the mod: backpacks can be opened, equipped and crafted. The mod
-adds a 3D backpack on the player's back, a dedicated inventory slot and its own open key.
+adds a 3D backpack on the player's back, a dedicated inventory slot, a one-screen window and
+its own open key. Every tier has a detailed model (side pockets, metal corner caps,
+compression straps, emblem, bedroll, pads and a lock — the higher the tier, the more parts).
 
 ## 2. Installation
 
 ### Server (admin)
 
-1. Put `Backpacks-1.0.0.jar` into `plugins/`.
+1. Put `Backpacks-2.0.0.jar` into `plugins/`.
 2. Start the server. On first start it creates:
    - `plugins/Backpacks/config.yml` — settings;
    - `plugins/Backpacks/messages.yml` — RU/EN texts;
@@ -35,7 +37,7 @@ adds a 3D backpack on the player's back, a dedicated inventory slot and its own 
 ### Client (for the 3D model and the inventory slot)
 
 1. Install Fabric Loader 0.20.1+ for Minecraft 26.3 and Fabric API.
-2. Put `backpacks-mod-1.0.0.jar` into `mods/`.
+2. Put `backpacks-mod-2.0.0.jar` into `mods/`.
 3. Launch the game and join the server.
 
 The mod is client-side only: without the server plugin it does nothing.
@@ -44,48 +46,53 @@ The mod is client-side only: without the server plugin it does nothing.
 
 1. **Get a backpack.** Ask an admin (`/bp give <name> 1`) or craft a *Linen Pouch*:
    5 string + 2 leather, anywhere in a 3×3 grid.
-2. **Equip it.** Right-click a backpack in your own inventory, or Shift+right-click a
-   backpack in hand, or use `/bp equip`. With the mod — left-click the backpack slot in
-   the survival inventory.
-3. **Open it.** With the mod press the open key (default **B**); without the mod press
-   **F** or right-click with an empty hand. `/bp`, right-clicking a backpack in hand and
-   right-clicking the backpack slot also work.
-4. **Store your items** and close the GUI (E). Everything is saved automatically.
+2. **Equip it.** Left-click the backpack slot in the survival inventory (mod), right-click a
+   backpack in your own inventory, Shift+right-click a backpack in hand, or use `/bp equip`.
+3. **Open it.** With the mod press the open key (default **B**) or right-click the backpack
+   slot; without the mod right-click with an empty hand. `/bp` and right-clicking a backpack
+   in hand also work.
+4. **Store your items** and close the window (E or ESC). Everything is saved automatically.
 5. **Upgrade** the backpack by crafting — the items inside stay in place.
 
 ## 4. Controls
 
 | Action | Without the mod | With the mod |
 | --- | --- | --- |
-| Open the equipped backpack | **F**, right-click with an empty hand, `/bp` | Open key (default **B**), `F`, `/bp`, right-click the backpack slot |
+| Open the equipped backpack | Right-click with an empty hand, `/bp` | Open key (default **B**), right-click the backpack slot, right-click with an empty hand, `/bp` |
 | Open a backpack in hand | Right-click the backpack | Right-click the backpack |
-| Equip | Right-click a backpack in your own inventory, Shift+right-click in hand, `/bp equip` | Left-click the backpack slot |
-| Unequip | **Shift+F**, Shift+right-click with an empty hand, `/bp unequip` | **Shift+open key**, left-click the backpack slot |
-| Swap to another backpack | Shift+right-click another backpack in hand | Shift+right-click another backpack in hand |
+| Equip | Right-click a backpack in your own inventory, Shift+right-click in hand, `/bp equip` | Left-click the backpack slot, right-click a backpack in your inventory |
+| Unequip | Shift+right-click with an empty hand, `/bp unequip` | Left-click the backpack slot, Shift+right-click with an empty hand, `/bp unequip` |
+| Take the worn backpack to the cursor | — | Left-click the backpack slot with an empty cursor |
+| Put a backpack from the cursor into the slot | — | Left-click the slot with a backpack on the cursor (replaces the worn one) |
+| Take an item from the backpack into your hand | — | **Middle-click** it in the backpack window; pick-block (MMB) in the world also finds items inside the equipped backpack |
 
 The open key can be changed in **Options → Controls → Backpacks**
 (`key.backpacks.open`). The item lore and messages always show the key that is actually
 bound.
+
+`F` opens the backpack only when `hotkey: SWAP_HANDS` is set in the config. The default is
+`NONE`: the mod key, the backpack slot and `/bp` already cover every case, and `F` stays a
+vanilla offhand swap.
 
 Limits: a backpack cannot be placed in an item frame or equipped on a horse, and
 right-clicking a jukebox with a backpack opens the backpack instead of playing the disc.
 
 ## 5. The backpack window
 
+- With the mod the whole backpack opens **on one screen without pages**: a chest-style
+  window, and large tiers (up to 256 cells) are scaled down to fit. Without the mod the
+  regular chest window with pages is used.
 - Capacity is counted in **cells**. A cell holds one stack of an item, and from tier 9
   onward up to **27 stacks** of the same item.
-- If there are more than 45 cells, the window is paged with the arrows at the bottom:
-  "Previous page" and "Next page".
-- Normal tiers (1–8) behave like a chest: LMB takes/puts a stack, Shift+LMB moves it
-  quickly.
-- Bulk cells (tiers 9–17):
-  - **LMB** — take/put a whole stack;
-  - **RMB** — take/put a single item;
-  - **Shift+LMB** — take everything from the cell;
-  - **Shift+LMB on an item in your inventory** — distribute it into matching cells of the
-    current page.
+- **LMB** — take/put a stack, **RMB** — one item, **Shift+LMB** on a cell — take everything
+  from it, **Shift+LMB** on an item in your inventory — put it into the backpack.
+- **MMB** on a cell — take a stack from the backpack into your inventory and hand. The same
+  works in the world: pick-block (MMB) on a block or mob finds the item in the equipped
+  backpack.
 - A backpack cannot be placed inside another backpack.
-- The GUI shows hints: item and stack counts per cell, page number and click help.
+- The window shows the tier name, the number of cells, the total item count in a bulk cell
+  and click hints; the cursor is rendered from server snapshots, so an item is never lost
+  on logout or death.
 
 ## 6. Crafting and upgrading
 
@@ -141,11 +148,12 @@ equipment:
 storage:
   file: backpacks.db
 
-hotkey: SWAP_HANDS      # F without the mod; NONE disables it
+hotkey: NONE            # SWAP_HANDS = F without the mod; NONE disables the key
 open-empty-hand: true   # right-click with an empty hand opens the equipped backpack
 require-mod: false      # kick players who do not have the client mod
 
 gui:
+  single-screen: true   # one screen without pages for modded clients (vanilla keeps the chest GUI)
   filler: GRAY_STAINED_GLASS_PANE
   sound-open: BLOCK_CHEST_OPEN
   sound-close: BLOCK_CHEST_CLOSE
@@ -179,6 +187,12 @@ upgrade never loses items.
 **Back up `backpacks.db` periodically** — preferably while the server is stopped; on a
 running server copy `backpacks.db-wal` and `backpacks.db-shm` as well.
 
+**Can I delete the `.jar` and keep the plugin folder?** Yes. All data lives in
+`plugins/Backpacks/` (`config.yml`, `messages.yml`, `backpacks.db`), not in the jar. Delete
+only `Backpacks-*.jar` and install the new jar — the folder and every stored backpack stay.
+Deleting the whole `plugins/Backpacks` folder deletes the settings and all backpack
+contents; if you do not need them, the folder can be removed too.
+
 What can destroy the **item** (contents stay in the database, but without the item they
 cannot be reached): lava, fire, the void, cactus, `/clear`, clearing plugins,
 `/bp remove`, or dying in lava/void with `keep-on-death: false`.
@@ -202,12 +216,17 @@ The client mod or Fabric API is missing. Without the mod the backpack looks like
 item but works fully.
 
 **The key does not open the backpack.**
-Check the bind in **Options → Controls → Backpacks**. Without the mod, `F` is used (when
-`hotkey: SWAP_HANDS`) and the backpack must be equipped.
+Check the bind in **Options → Controls → Backpacks**. Without the mod, `F` is used only
+when `hotkey: SWAP_HANDS` (default `NONE`), and the backpack must be equipped. With the mod,
+right-clicking the backpack slot and `/bp` also work.
 
 **Where did my items go after an upgrade?**
-They are inside: upgrading only changes the tier and capacity. Open the backpack and check
-the following pages.
+They are inside: upgrading only changes the tier and capacity. Open the backpack — with the
+mod all cells are visible at once, without pages.
+
+**Why does the backpack no longer glow?**
+The glint was removed on purpose: the backpack is not enchanted, and the tier is shown by
+the name gradient and the model colours.
 
 **How do I move backpacks to another server?**
 Move `backpacks.db` together with the items (or give new ones). Contents are tied to the

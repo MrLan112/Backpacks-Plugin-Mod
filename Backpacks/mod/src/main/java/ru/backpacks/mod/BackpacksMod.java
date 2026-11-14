@@ -21,13 +21,24 @@ public final class BackpacksMod implements ClientModInitializer {
         PayloadTypeRegistry.serverboundPlay().register(BackpackSignals.Open.TYPE, BackpackSignals.Open.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(BackpackSignals.Hello.TYPE, BackpackSignals.Hello.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(BackpackSignals.Key.TYPE, BackpackSignals.Key.CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(BackpackSignals.Toggle.TYPE, BackpackSignals.Toggle.CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(BackpackSignals.Unequip.TYPE, BackpackSignals.Unequip.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(BackpackSignals.Slot.TYPE, BackpackSignals.Slot.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(BackpackSignals.GuiClick.TYPE, BackpackSignals.GuiClick.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(BackpackSignals.GuiClosed.TYPE, BackpackSignals.GuiClosed.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(BackpackSignals.Sync.TYPE, BackpackSignals.Sync.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(BackpackSignals.GuiOpen.TYPE, BackpackSignals.GuiOpen.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(BackpackSignals.GuiData.TYPE, BackpackSignals.GuiData.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(BackpackSignals.GuiClose.TYPE, BackpackSignals.GuiClose.CODEC);
 
         ClientPlayNetworking.registerGlobalReceiver(BackpackSignals.Sync.TYPE,
                 (payload, context) -> BackpackState.set(payload.entityId(), payload.tier(),
                         payload.bodyColor(), payload.accentColor()));
+
+        ClientPlayNetworking.registerGlobalReceiver(BackpackSignals.GuiOpen.TYPE,
+                (payload, context) -> context.client().execute(() -> BackpackScreen.open(payload)));
+        ClientPlayNetworking.registerGlobalReceiver(BackpackSignals.GuiData.TYPE,
+                (payload, context) -> context.client().execute(() -> BackpackScreen.applyData(payload)));
+        ClientPlayNetworking.registerGlobalReceiver(BackpackSignals.GuiClose.TYPE,
+                (payload, context) -> context.client().execute(() -> BackpackScreen.close(payload.sessionId())));
 
         KeyMapping.Category category = KeyMapping.Category.register(
                 Identifier.fromNamespaceAndPath("backpacks", "backpacks"));
@@ -40,20 +51,16 @@ public final class BackpacksMod implements ClientModInitializer {
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (openKey.consumeClick()) {
-                if (client.player != null && client.player.isShiftKeyDown()) {
-                    send(new BackpackSignals.Unequip());
-                } else {
-                    send(new BackpackSignals.Open());
-                }
+                send(new BackpackSignals.Open());
             }
             sendKey();
         });
 
-        // Lets the server know the client has the mod (used by require-mod only),
+        // Lets the server know the client has the mod and supports the one-screen GUI,
         // then tells it which key is actually bound to opening the backpack.
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             sentBinding = null;
-            send(new BackpackSignals.Hello());
+            send(new BackpackSignals.Hello(BackpackSignals.Hello.CURRENT));
             sendKey();
         });
 

@@ -106,7 +106,9 @@ public final class BackpackItems {
             meta.setCustomModelData(tier.modelData());
             meta.setMaxStackSize(1);
             meta.setRarity(tier.rarity());
-            meta.setEnchantmentGlintOverride(tier.ordinal() >= 13);
+            // No glint: the tier gradient in the name already separates the tiers,
+            // and a glowing backpack looked like an enchanted item.
+            meta.setEnchantmentGlintOverride(false);
             meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
 
             meta.getPersistentDataContainer().set(tierKey, PersistentDataType.STRING, tier.id());

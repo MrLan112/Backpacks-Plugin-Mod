@@ -20,9 +20,9 @@ import java.util.List;
 
 /**
  * Fake backpack slot in the survival inventory, right next to the player preview
- * (above the offhand slot). The slot itself lives only on the client; a click sends
- * {@code backpacks:toggle} and the server decides whether to equip or unequip.
- * Right click sends {@code backpacks:open} to open the equipped backpack.
+ * (above the offhand slot). The slot itself lives only on the client; clicks send
+ * {@code backpacks:slot} and the server owns the result: LMB takes the worn backpack
+ * to the cursor or puts a backpack from the cursor into the slot, RMB opens it.
  */
 public final class BackpackSlot {
     private static final Identifier SLOT_SPRITE =
@@ -123,12 +123,8 @@ public final class BackpackSlot {
         if (event.x() < x || event.x() >= x + SIZE || event.y() < y || event.y() >= y + SIZE) {
             return true;
         }
-        if (event.button() == 0) {
-            ClientPlayNetworking.send(new BackpackSignals.Toggle());
-            return false;
-        }
-        if (event.button() == 1) {
-            ClientPlayNetworking.send(new BackpackSignals.Open());
+        if (event.button() == 0 || event.button() == 1) {
+            ClientPlayNetworking.send(new BackpackSignals.Slot(event.button()));
             return false;
         }
         return true;

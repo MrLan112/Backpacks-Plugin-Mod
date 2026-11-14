@@ -21,6 +21,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import io.papermc.paper.event.player.PlayerPickItemEvent;
 
 public final class PlayerListener implements Listener {
     private final BackpacksPlugin plugin;
@@ -42,6 +43,23 @@ public final class PlayerListener implements Listener {
                 plugin.items().refreshKeys(player);
             }
         });
+
+        // The client sends its hello as soon as it joins; that packet can arrive before
+        // the player is fully added to the server, so the first sync may be lost. Send
+        // the worn tier again once the entity exists on the client, and once more as a
+        // safety net. Without this a rejoin showed no backpack until the next action.
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (player.isOnline()) {
+                plugin.modBridge().broadcastSync(player);
+                plugin.modBridge().syncAll(player);
+            }
+        }, 20L);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (player.isOnline()) {
+                plugin.modBridge().broadcastSync(player);
+                plugin.modBridge().syncAll(player);
+            }
+        }, 60L);
 
         if (!plugin.getConfig().getBoolean("require-mod", false)) {
             return;
@@ -199,8 +217,10 @@ public final class PlayerListener implements Listener {
     }
 
     /**
-     * Optional hotkey: F opens the equipped backpack.
-     * Shift+F always removes the equipped backpack (no command/mod needed).
+     * Optional keybind: swap-hands (F) opens the equipped backpack. Disabled by default
+     * because the client mod and {@code /bp} already open it; keeping it on steals a
+     * vanilla key. Unequipping is done by LMB on the backpack slot or Shift+RMB with an
+     * empty hand, so there is no hidden Shift+F action anymore.
      */
     @EventHandler(ignoreCancelled = true)
     public void onSwapHands(PlayerSwapHandItemsEvent event) {
@@ -208,14 +228,7 @@ public final class PlayerListener implements Listener {
         if (!player.hasPermission("backpacks.use")) {
             return;
         }
-        if (player.isSneaking()) {
-            if (plugin.items().equipped(player) != null) {
-                event.setCancelled(true);
-                plugin.gui().unequip(player);
-            }
-            return;
-        }
-        if (!"SWAP_HANDS".equalsIgnoreCase(plugin.getConfig().getString("hotkey", "SWAP_HANDS"))) {
+        if (!"SWAP_HANDS".equalsIgnoreCase(plugin.getConfig().getString("hotkey", "NONE"))) {
             return;
         }
         if (plugin.items().isBackpack(player.getInventory().getItemInMainHand())
@@ -229,8 +242,34 @@ public final class PlayerListener implements Listener {
         plugin.gui().openEquipped(player);
     }
 
+    /**
+     * Middle-click pick block also looks inside the equipped backpack. The vanilla
+     * search only checks the 36 inventory slots and reports {@code sourceSlot == -1}
+     * when the item is missing, so that is exactly the case handled here.
+     */
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onPickItem(PlayerPickItemEvent event) {
+        if (event.getSourceSlot() >= 0) {
+            // The item is already in the inventory: vanilla handles it (and swaps slots).
+            return;
+        }
+        Player player = event.getPlayer();
+        if (!player.hasPermission("backpacks.use")) {
+            return;
+        }
+        if (!plugin.gui().pickFromBackpack(player, event.getItem())) {
+            return;
+        }
+        // The stack is already in the inventory and the hotbar is selected; cancel so
+        // creative mode does not spawn a second copy in the target slot.
+        event.setCancelled(true);
+        player.updateInventory();
+    }
+
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
+        // A custom GUI has no server inventory to close automatically.
+        plugin.gui().handleDeath(event.getEntity());
         if (plugin.getConfig().getBoolean("equipment.keep-on-death", true)) {
             return;
         }

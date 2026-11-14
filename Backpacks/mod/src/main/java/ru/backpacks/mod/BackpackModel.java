@@ -11,53 +11,108 @@ import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 
 /**
- * A small backpack built from boxes. Geometry lives in the player body's local space:
+ * A detailed backpack built from boxes. Geometry lives in the player body's local space:
  * the body cube goes from y=0 (shoulders) down to y=12 (waist) and from z=-2 (chest)
- * to z=2 (back), so the backpack sits on top of the back at positive z.
+ * to z=2 (back), so the backpack sits on the back at positive z.
  *
- * <p>Two independent meshes are baked: the main body (tinted with the tier body colour)
- * and the accents — flap, buckle and shoulder straps — tinted with the accent colour.
- * Both share one neutral texture, the colour comes from the per-submit tint.</p>
+ * <p>Four independent meshes are baked: the main body (tinted with the tier body colour),
+ * the accents (flap, buckle, shoulder straps), a metal frame for tiers 4+ and a bedroll
+ * for tiers 10+. All share one neutral texture, the colour comes from the per-submit
+ * tint.</p>
  */
 public final class BackpackModel extends Model<Float> {
+    private static final float FLAP_TINT = 0.0F;
+
     private BackpackModel(ModelPart root) {
         super(root, RenderTypes::entityCutout);
     }
 
+    /** Cloth, leather and the padded shell. */
     public static BackpackModel base() {
         MeshDefinition mesh = new MeshDefinition();
         PartDefinition root = mesh.getRoot();
 
-        CubeListBuilder main = CubeListBuilder.create().texOffs(0, 0)
-                .addBox(-4.0F, 1.0F, 2.2F, 8.0F, 9.0F, 3.2F);
-        CubeListBuilder pocket = CubeListBuilder.create().texOffs(24, 0)
-                .addBox(-2.6F, 5.0F, 5.4F, 5.2F, 4.0F, 0.9F);
-        CubeListBuilder bottom = CubeListBuilder.create().texOffs(0, 16)
-                .addBox(-3.5F, 9.9F, 2.6F, 7.0F, 1.1F, 2.4F);
+        CubeListBuilder body = CubeListBuilder.create().texOffs(0, 0)
+                // Main shell.
+                .addBox(-4.2F, 1.0F, 2.0F, 8.4F, 8.8F, 3.6F)
+                // Reinforced bottom.
+                .addBox(-4.0F, 9.4F, 2.3F, 8.0F, 0.9F, 3.1F)
+                // Rolled top.
+                .addBox(-4.0F, 0.3F, 2.3F, 8.0F, 1.1F, 3.2F)
+                .addBox(-4.55F, 0.4F, 2.4F, 0.6F, 0.9F, 3.0F)
+                .addBox(3.95F, 0.4F, 2.4F, 0.6F, 0.9F, 3.0F)
+                // Side pockets.
+                .addBox(-4.85F, 4.1F, 2.5F, 0.75F, 3.3F, 2.9F)
+                .addBox(4.1F, 4.1F, 2.5F, 0.75F, 3.3F, 2.9F)
+                // Front pocket.
+                .addBox(-2.9F, 4.7F, 5.55F, 5.8F, 3.6F, 0.75F)
+                // Back panel resting against the player.
+                .addBox(-4.1F, 1.2F, 1.9F, 8.2F, 8.4F, 0.3F);
 
-        root.addOrReplaceChild("body", main, PartPose.ZERO);
-        root.addOrReplaceChild("pocket", pocket, PartPose.ZERO);
-        root.addOrReplaceChild("bottom", bottom, PartPose.ZERO);
+        root.addOrReplaceChild("body", body, PartPose.ZERO);
         return new BackpackModel(LayerDefinition.create(mesh, 64, 64).bakeRoot());
     }
 
+    /** Flap, centre strap, buckles, shoulder straps and the handle. */
     public static BackpackModel accents() {
         MeshDefinition mesh = new MeshDefinition();
         PartDefinition root = mesh.getRoot();
 
-        CubeListBuilder flap = CubeListBuilder.create().texOffs(0, 32)
-                .addBox(-4.2F, 0.5F, 2.1F, 8.4F, 2.9F, 3.9F);
-        CubeListBuilder buckle = CubeListBuilder.create().texOffs(28, 32)
-                .addBox(-1.2F, 2.9F, 5.9F, 2.4F, 1.3F, 0.7F);
-        CubeListBuilder strapLeft = CubeListBuilder.create().texOffs(28, 40)
-                .addBox(-3.7F, 0.2F, -2.5F, 1.5F, 1.2F, 5.2F);
-        CubeListBuilder strapRight = CubeListBuilder.create().texOffs(44, 40)
-                .addBox(2.2F, 0.2F, -2.5F, 1.5F, 1.2F, 5.2F);
+        CubeListBuilder accents = CubeListBuilder.create().texOffs(0, 32)
+                // Flap draping over the top.
+                .addBox(-4.35F, 0.5F, 1.9F, 8.7F, 2.7F, 4.1F)
+                // Centre strap and buckle.
+                .addBox(-1.0F, 1.9F, 5.7F, 2.0F, 3.7F, 0.35F)
+                .addBox(-1.2F, 2.5F, 5.95F, 2.4F, 1.3F, 0.6F)
+                // Shoulder straps.
+                .addBox(-3.9F, 0.15F, -2.3F, 1.5F, 1.0F, 5.4F)
+                .addBox(2.4F, 0.15F, -2.3F, 1.5F, 1.0F, 5.4F)
+                // Strap adjusters.
+                .addBox(-3.85F, 2.2F, 2.95F, 1.4F, 0.6F, 0.35F)
+                .addBox(2.45F, 2.2F, 2.95F, 1.4F, 0.6F, 0.35F)
+                // Handle and its posts.
+                .addBox(-1.7F, 0.1F, 3.2F, 3.4F, 0.7F, 1.8F)
+                .addBox(-1.9F, 0.5F, 3.1F, 0.5F, 1.0F, 2.0F)
+                .addBox(1.4F, 0.5F, 3.1F, 0.5F, 1.0F, 2.0F)
+                // Rivets on the flap corners.
+                .addBox(-3.9F, 2.9F, 5.75F, 0.5F, 0.5F, 0.3F)
+                .addBox(3.4F, 2.9F, 5.75F, 0.5F, 0.5F, 0.3F)
+                .addBox(-3.9F, 0.8F, 5.75F, 0.5F, 0.5F, 0.3F)
+                .addBox(3.4F, 0.8F, 5.75F, 0.5F, 0.5F, 0.3F);
 
-        root.addOrReplaceChild("flap", flap, PartPose.ZERO);
-        root.addOrReplaceChild("buckle", buckle, PartPose.ZERO);
-        root.addOrReplaceChild("strap_left", strapLeft, PartPose.ZERO);
-        root.addOrReplaceChild("strap_right", strapRight, PartPose.ZERO);
+        root.addOrReplaceChild("accents", accents, PartPose.ZERO);
+        return new BackpackModel(LayerDefinition.create(mesh, 64, 64).bakeRoot());
+    }
+
+    /** Metal corner caps and a top rail, shown from tier 4. */
+    public static BackpackModel frame() {
+        MeshDefinition mesh = new MeshDefinition();
+        PartDefinition root = mesh.getRoot();
+
+        CubeListBuilder frame = CubeListBuilder.create().texOffs(0, 48)
+                .addBox(-4.5F, 8.8F, 2.0F, 1.0F, 1.0F, 1.2F)
+                .addBox(3.5F, 8.8F, 2.0F, 1.0F, 1.0F, 1.2F)
+                .addBox(-4.5F, 8.8F, 4.4F, 1.0F, 1.0F, 1.2F)
+                .addBox(3.5F, 8.8F, 4.4F, 1.0F, 1.0F, 1.2F)
+                .addBox(-4.35F, 0.55F, 5.55F, 8.7F, 0.5F, 0.4F);
+
+        root.addOrReplaceChild("frame", frame, PartPose.ZERO);
+        return new BackpackModel(LayerDefinition.create(mesh, 64, 64).bakeRoot());
+    }
+
+    /** A rolled bedroll strapped on top, shown from tier 10. */
+    public static BackpackModel bedroll() {
+        MeshDefinition mesh = new MeshDefinition();
+        PartDefinition root = mesh.getRoot();
+
+        CubeListBuilder roll = CubeListBuilder.create().texOffs(32, 48)
+                .addBox(-4.2F, -0.4F, 2.2F, 8.4F, 0.75F, 3.3F)
+                .addBox(-4.45F, -0.3F, 2.3F, 0.35F, 0.6F, 3.1F)
+                .addBox(4.1F, -0.3F, 2.3F, 0.35F, 0.6F, 3.1F)
+                .addBox(-2.8F, -0.45F, 2.15F, 0.5F, 0.85F, 3.4F)
+                .addBox(2.3F, -0.45F, 2.15F, 0.5F, 0.85F, 3.4F);
+
+        root.addOrReplaceChild("bedroll", roll, PartPose.ZERO);
         return new BackpackModel(LayerDefinition.create(mesh, 64, 64).bakeRoot());
     }
 
@@ -66,18 +121,37 @@ public final class BackpackModel extends Model<Float> {
         // Static geometry: nothing to animate.
     }
 
-    /** Renders both passes at the current pose, with the tier colours as tint. */
+    /** Renders every pass at the current pose, with the tier colours as tint. */
     public static void render(PoseStack pose, net.minecraft.client.renderer.SubmitNodeCollector collector,
                               int light, net.minecraft.resources.Identifier texture, BackpackState.Wear wear) {
         var renderType = net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(texture);
-        collector.submitModel(BASE, 0.0F, pose, renderType, light,
+        collector.submitModel(BASE, FLAP_TINT, pose, renderType, light,
                 net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY,
                 0xFF000000 | wear.bodyColor());
-        collector.submitModel(ACCENTS, 0.0F, pose, renderType, light,
+        collector.submitModel(ACCENTS, FLAP_TINT, pose, renderType, light,
                 net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY,
                 0xFF000000 | wear.accentColor());
+        if (wear.tier() >= 4) {
+            collector.submitModel(FRAME, FLAP_TINT, pose, renderType, light,
+                    net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY,
+                    0xFF000000 | darken(wear.accentColor(), 0.72F));
+        }
+        if (wear.tier() >= 10) {
+            collector.submitModel(BEDROLL, FLAP_TINT, pose, renderType, light,
+                    net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY,
+                    0xFF000000 | darken(wear.bodyColor(), 0.8F));
+        }
+    }
+
+    private static int darken(int rgb, float factor) {
+        int r = (int) (((rgb >> 16) & 0xFF) * factor);
+        int g = (int) (((rgb >> 8) & 0xFF) * factor);
+        int b = (int) ((rgb & 0xFF) * factor);
+        return (r << 16) | (g << 8) | b;
     }
 
     private static final BackpackModel BASE = base();
     private static final BackpackModel ACCENTS = accents();
+    private static final BackpackModel FRAME = frame();
+    private static final BackpackModel BEDROLL = bedroll();
 }

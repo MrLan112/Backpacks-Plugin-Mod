@@ -8,14 +8,16 @@ storage:
   file: backpacks.db
 
 # Клавиша открытия надетого рюкзака без мода.
-# SWAP_HANDS — F, NONE — выключено.
-hotkey: SWAP_HANDS
+# SWAP_HANDS — F, NONE — выключено (по умолчанию: мод и /bp уже открывают рюкзак).
+hotkey: NONE
 # ПКМ пустой рукой открывает надетый рюкзак.
 open-empty-hand: true
 # Кикать игроков без клиентского мода.
 require-mod: false
 
 gui:
+  # Один экран без страниц для клиентов с модом (vanilla-клиенты видят сундук).
+  single-screen: true
   filler: GRAY_STAINED_GLASS_PANE
   sound-open: BLOCK_CHEST_OPEN
   sound-close: BLOCK_CHEST_CLOSE

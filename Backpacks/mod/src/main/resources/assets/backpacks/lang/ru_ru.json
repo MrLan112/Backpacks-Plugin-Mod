@@ -3,8 +3,11 @@
   "key.category.backpacks.backpacks": "Рюкзаки",
   "key.categories.backpacks": "Рюкзаки",
   "screen.backpacks.slot": "Слот рюкзака",
-  "screen.backpacks.slot.empty": "Пусто — кликните, чтобы надеть рюкзак из инвентаря",
+  "screen.backpacks.slot.empty": "Пусто — ЛКМ наденет рюкзак из инвентаря",
   "screen.backpacks.slot.tier": "Надет рюкзак, тир %s",
-  "screen.backpacks.slot.hint": "ЛКМ — надеть или снять",
-  "screen.backpacks.slot.open": "ПКМ — открыть"
+  "screen.backpacks.slot.hint": "ЛКМ — взять или положить рюкзак",
+  "screen.backpacks.slot.open": "ПКМ — открыть",
+  "screen.backpacks.gui.subtitle": "%s слотов • %s или ESC — закрыть",
+  "screen.backpacks.gui.total": "Всего: %s шт.",
+  "screen.backpacks.gui.pick": "СКМ — взять в руку"
 }
