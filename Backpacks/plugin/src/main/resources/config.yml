@@ -16,9 +16,6 @@ open-empty-hand: true
 require-mod: false
 
 gui:
-  # Один экран без страниц для клиентов с модом (vanilla-клиенты видят сундук).
-  single-screen: true
-  filler: GRAY_STAINED_GLASS_PANE
   sound-open: BLOCK_CHEST_OPEN
   sound-close: BLOCK_CHEST_CLOSE
   sound-click: UI_BUTTON_CLICK

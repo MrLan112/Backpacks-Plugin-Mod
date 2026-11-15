@@ -268,7 +268,7 @@ public final class PlayerListener implements Listener {
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
-        // A custom GUI has no server inventory to close automatically.
+        // Finish the open session and drop the cursor stack before the inventory is scattered.
         plugin.gui().handleDeath(event.getEntity());
         if (plugin.getConfig().getBoolean("equipment.keep-on-death", true)) {
             return;

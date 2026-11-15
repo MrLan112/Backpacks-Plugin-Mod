@@ -6,8 +6,5 @@
   "screen.backpacks.slot.empty": "Пусто — ЛКМ наденет рюкзак из инвентаря",
   "screen.backpacks.slot.tier": "Надет рюкзак, тир %s",
   "screen.backpacks.slot.hint": "ЛКМ — взять или положить рюкзак",
-  "screen.backpacks.slot.open": "ПКМ — открыть",
-  "screen.backpacks.gui.subtitle": "%s слотов • %s или ESC — закрыть",
-  "screen.backpacks.gui.total": "Всего: %s шт.",
-  "screen.backpacks.gui.pick": "СКМ — взять в руку"
+  "screen.backpacks.slot.open": "ПКМ — открыть"
 }

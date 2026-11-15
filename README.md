@@ -23,14 +23,14 @@ Wearable, upgradeable backpacks for **Purpur/Paper 26.3**, with an optional **Fa
 - **Upgrade chain** — every tier is crafted from the previous backpack plus materials; contents and the storage UUID survive the upgrade (the recipe book shows all 17 recipes).
 - **Bulk cells** — starting with tier 9, one GUI cell can hold up to **27 stacks** of the same item.
 - **Wearable** — the backpack sits in a dedicated slot, not in a chest. Equip without commands: left-click the backpack slot in the survival inventory (mod), right-click a backpack in your inventory, or **Shift + right-click** a backpack in hand. Unequip: left-click the slot, **Shift + right-click** with an empty hand, or `/bp unequip`.
-- **One-screen window with the mod** — the whole backpack is visible at once, no pages. Tiers up to 256 slots are scaled down automatically to fit the screen. Vanilla clients keep the paginated chest GUI.
-- **Middle-click pick** — middle-click an item inside the backpack GUI to move a stack into your inventory and hand; pick-block in the world also searches the equipped backpack.
+- **Native backpack window** — the backpack opens as a real chest inventory, so every client (with or without the mod) gets ordinary Minecraft slots: left/right click, shift-click, number keys, **Q / Ctrl+Q**, double-click and dragging work exactly like a chest. Backpacks up to 45 slots open in a chest sized to their capacity; larger tiers use 45-cell pages with prev/page/next arrows.
+- **Middle-click pick** — pick-block (middle mouse) a block or entity in the world and the matching item is taken from the equipped backpack when it is missing from your inventory.
 - **Detailed 3D models** — every tier has its own 64×64 texture and a 22–44 element model: side pockets (tier 3+), metal corner caps (4+), compression straps (6+), emblem (8+), reinforcement bands (10+), a bedroll (12+), shoulder pads (14+), a lock plate (15+) and a star on the Ultimate tier. The worn model has metal and bedroll passes and follows sneaking, swimming and elytra.
 - **No glint** — backpacks are not enchanted-looking; the tier is shown by the name gradient and the model colours.
-- **No commands from the mod** — the client talks to the server through custom payloads (`backpacks:open`, `backpacks:slot`, `backpacks:gui_click`, `backpacks:gui_closed`, `backpacks:hello`, `backpacks:key`); the server answers with `backpacks:sync`, `backpacks:gui_open`, `backpacks:gui_data` and `backpacks:gui_close`.
+- **No commands from the mod** — the client talks to the server through custom payloads (`backpacks:open`, `backpacks:unequip`, `backpacks:slot`, `backpacks:hello`, `backpacks:key`); the server only answers with `backpacks:sync` for the worn 3D models. The window itself is a normal chest, so no GUI data is sent.
 - **SQLite storage** — contents are stored per backpack UUID, not inside the item, and survive upgrades, death (configurable) and server restarts.
 - **RU + EN** — all messages and item lore are localised; the lore shows the key that is actually bound in the client controls.
-- **Vanilla fallback** — the plugin is fully playable without the client mod (the 3D model, the inventory slot and the one-screen GUI are only available with the mod).
+- **Vanilla fallback** — the plugin is fully playable without the client mod (the 3D model and the inventory slot are only available with the mod).
 
 ## Requirements
 
@@ -44,7 +44,7 @@ Wearable, upgradeable backpacks for **Purpur/Paper 26.3**, with an optional **Fa
 
 ### Server
 
-1. Download `Backpacks-2.0.1.jar` from [Releases](https://github.com/MrLan112/Backpacks-Plugin-Mod/releases) and put it into `plugins/`.
+1. Download `Backpacks-2.0.2.jar` from [Releases](https://github.com/MrLan112/Backpacks-Plugin-Mod/releases) and put it into `plugins/`.
 2. Start the server. On first start the plugin creates:
    - `plugins/Backpacks/config.yml`
    - `plugins/Backpacks/messages.yml`
@@ -54,10 +54,10 @@ Wearable, upgradeable backpacks for **Purpur/Paper 26.3**, with an optional **Fa
 ### Client (for the 3D model, inventory slot and hotkey)
 
 1. Install Fabric Loader 0.20.1+ for Minecraft 26.3 and Fabric API.
-2. Download `backpacks-mod-2.0.1.jar` from [Releases](https://github.com/MrLan112/Backpacks-Plugin-Mod/releases) and put it into `.minecraft/mods/`.
+2. Download `backpacks-mod-2.0.2.jar` from [Releases](https://github.com/MrLan112/Backpacks-Plugin-Mod/releases) and put it into `.minecraft/mods/`.
 3. Launch the game and join the server.
 
-Without the mod the plugin still works (commands, inventory right-click, empty-hand right-click, `/bp`), but the backpack item uses the plain fallback model, the inventory slot and the one-screen GUI are not available.
+Without the mod the plugin still works (commands, inventory right-click, empty-hand right-click, `/bp`), but the backpack item uses the plain fallback model and the inventory slot is not available.
 
 ## Controls
 
@@ -69,11 +69,11 @@ Without the mod the plugin still works (commands, inventory right-click, empty-h
 | Unequip | **Shift + right-click** with an empty hand, `/bp unequip` | **Left-click** the backpack slot, **Shift + open key**, **Shift + right-click** with an empty hand, `/bp unequip` |
 | Take the worn backpack to the cursor | — | **Left-click** the backpack slot with an empty cursor |
 | Put a backpack from the cursor into the slot | — | **Left-click** the slot with a backpack on the cursor (replaces the worn one) |
-| Take an item from the backpack into your hand | — | **Middle-click** it in the backpack GUI (one stack, or everything left when less than a stack); pick-block (MMB) in the world also finds items inside the equipped backpack |
+| Take items out | Chest controls (click, shift-click, number keys, **Q / Ctrl+Q**, drag) | Same, plus pick-block (MMB) in the world finds items stored in the equipped backpack |
 
 The open key can be changed in **Options → Controls → Backpacks**. The item lore and messages always show the key that is actually bound. `F` opens the backpack only when `hotkey: SWAP_HANDS` is set in the config; the default is `NONE`, because the mod key, the backpack slot and `/bp` already cover it.
 
-Without the mod the backpack window is a regular chest GUI with pages. With the mod the whole backpack fits on one screen: tiers up to 256 slots are scaled down instead of being split into pages. Left/right click, shift-click, number keys (swap with a hotbar slot), **Q / Ctrl+Q** (drop one / the stack), double-click (collect matching stacks) and dragging work like a chest; middle-click takes a stack out of the backpack, or everything left when it is smaller than a stack.
+The backpack window is a normal chest inventory for every client: one-page backpacks use a chest sized to their capacity, larger ones use 45 cells per page with arrows in the bottom row. Left/right click, shift-click, number keys (swap with a hotbar slot), **Q / Ctrl+Q** (drop one / the stack), double-click (collect matching stacks) and dragging behave exactly like a chest. Bulk tiers (9+) keep up to 27 stacks in one cell: LMB takes a stack, RMB takes one item, Shift+LMB takes everything.
 
 Backpacks cannot be put on a horse (legacy stacks) or placed in an item frame, and right-clicking a jukebox with a backpack opens the backpack instead of playing the disc.
 
@@ -141,8 +141,6 @@ open-empty-hand: true   # right-click with an empty hand opens the equipped back
 require-mod: false      # kick players who do not have the client mod
 
 gui:
-  single-screen: true   # one screen without pages for modded clients (vanilla keeps the chest GUI)
-  filler: GRAY_STAINED_GLASS_PANE
   sound-open: BLOCK_CHEST_OPEN
   sound-close: BLOCK_CHEST_CLOSE
   sound-click: UI_BUTTON_CLICK
@@ -186,8 +184,8 @@ gradlew.bat build
 
 Output:
 
-- `plugin/build/libs/Backpacks-2.0.1.jar` — server plugin (SQLite driver shaded in)
-- `mod/build/libs/backpacks-mod-2.0.1.jar` — Fabric client mod
+- `plugin/build/libs/Backpacks-2.0.2.jar` — server plugin (SQLite driver shaded in)
+- `mod/build/libs/backpacks-mod-2.0.2.jar` — Fabric client mod
 
 The Gradle wrapper downloads Gradle 9.9.1 automatically. The mod's models, item definitions and textures can be regenerated with Python 3 and Pillow:
 
@@ -225,8 +223,8 @@ python tools/gen_backpacks.py mod/src/main/resources
 - **Цепочка крафта**: каждый тир крафтится из рюкзака предыдущего тира и материалов; содержимое и UUID сохраняются при улучшении. Все рецепты видны в книге рецептов.
 - **Ячейки-стаки**: с 9-го тира одна ячейка вмещает до **27 стаков** одного предмета.
 - **Надевание без команд**: ЛКМ по слоту рюкзака в инвентаре (с модом), ПКМ по рюкзаку в инвентаре или Shift+ПКМ рюкзаком в руке; снятие — ЛКМ по слоту, **Shift+клавиша открытия**, Shift+ПКМ пустой рукой или `/bp unequip`.
-- **Одно окно с модом**: весь рюкзак виден сразу, без страниц; большие тиры до 256 ячеек автоматически уменьшаются. Без мода — обычный сундук со страницами. Работают привычные приёмы сундука: Shift+ЛКМ, цифры 1–9 (обмен с хотбаром), Q / Ctrl+Q, двойной клик и перетаскивание.
-- **СКМ**: средний клик по предмету в рюкзаке забирает в руку стак, а если предметов меньше стака — всё, что осталось; pick-block в мире тоже ищет предмет в надетом рюкзаке.
+- **Обычное окно рюкзака**: рюкзак открывается как настоящий сундук, поэтому всем клиентам (с модом и без) доступны обычные слоты Minecraft: ЛКМ/ПКМ, Shift+ЛКМ, цифры 1–9, Q / Ctrl+Q, двойной клик и перетаскивание работают как в сундуке. Рюкзаки до 45 ячеек открываются в сундуке подходящего размера, большие тиры — по 45 ячеек на страницу со стрелками в нижнем ряду.
+- **СКМ**: pick-block (средняя кнопка мыши) по блоку или существу в мире берёт предмет из надетого рюкзака, если его нет в инвентаре.
 - **Детальные модели**: у каждого тира своя текстура 64×64 и модель на 22–44 элемента — боковые карманы (3+), металлические уголки (4+), стяжки (6+), эмблема (8+), усилители (10+), скатка (12+), плечевые подушки (14+), замок (15+) и звезда на 17-м тире. Свечения у рюкзаков нет.
 - **Хранение**: SQLite по UUID предмета, содержимое не теряется при улучшении и перезапуске; есть защита от перезаписи и повреждения данных.
 - **RU + EN**: сообщения и лор предметов, клавиша в лоре берётся из настроек клиента.
@@ -234,7 +232,7 @@ python tools/gen_backpacks.py mod/src/main/resources
 
 **Подробные инструкции:** [Как пользоваться — Русский](how%20to%20use%20RU/README.md) · [How to use — English](how%20to%20use%20EN/README.md)
 
-**Установка:** `Backpacks-2.0.1.jar` → `plugins/`, `backpacks-mod-2.0.1.jar` → `mods/` клиента (Fabric).
+**Установка:** `Backpacks-2.0.2.jar` → `plugins/`, `backpacks-mod-2.0.2.jar` → `mods/` клиента (Fabric).
 
 **Сборка из исходников:** нужен JDK 25; в папке `Backpacks` выполните `gradlew.bat build` (Windows) или `./gradlew build`.
 

@@ -16,7 +16,7 @@ import java.util.List;
 
 public final class Msg {
     /** Bump when bundled messages change; stale files are backed up and replaced. */
-    private static final int MESSAGES_VERSION = 6;
+    private static final int MESSAGES_VERSION = 7;
 
     private final BackpacksPlugin plugin;
     private final MiniMessage mini = MiniMessage.miniMessage();

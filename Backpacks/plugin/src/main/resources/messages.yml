@@ -1,4 +1,4 @@
-messages-version: 6
+messages-version: 7
 
 ru:
   prefix: '<gradient:#f6d365:#fda085><bold>Рюкзаки</bold></gradient> <dark_gray>»</dark_gray> '
@@ -38,7 +38,7 @@ ru:
   bulk-hint: '<dark_gray>ЛКМ — стак, ПКМ — 1 шт., Shift+ЛКМ — всё'
   cell-count: '<gray>{amount} шт. <dark_gray>({stacks} стак.)'
   close-hint: '<dark_gray>E — закрыть'
-  gui-title: '<dark_gray>{tier} <gray>• <white>{size}</white> слотов'
+  gui-title: '{tier}'
   mod-required: '<red>Для игры на сервере нужен мод Backpacks. Скачай его у администратора.'
   recipes-title: '<gradient:#8ec5fc:#e0c3fc><bold>Рецепты рюкзаков</bold></gradient>'
   recipe-tier: '<gray>Тир <white>{tier}</white>/<white>{total}</white>'
@@ -110,7 +110,7 @@ en:
   bulk-hint: '<dark_gray>LMB — stack, RMB — 1 item, Shift+LMB — all'
   cell-count: '<gray>{amount} items <dark_gray>({stacks} stacks)'
   close-hint: '<dark_gray>E to close'
-  gui-title: '<dark_gray>{tier} <gray>• <white>{size}</white> slots'
+  gui-title: '{tier}'
   mod-required: '<red>This server requires the Backpacks mod. Ask an admin for the file.'
   recipes-title: '<gradient:#8ec5fc:#e0c3fc><bold>Backpack recipes</bold></gradient>'
   recipe-tier: '<gray>Tier <white>{tier}</white>/<white>{total}</white>'

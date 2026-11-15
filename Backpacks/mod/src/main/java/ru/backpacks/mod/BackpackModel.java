@@ -127,25 +127,28 @@ public final class BackpackModel extends Model<Float> {
         // Static geometry: nothing to animate.
     }
 
-    /** Renders every pass at the current pose, with the tier colours as tint. */
+    /** Renders every pass at the current pose, tinted from the tier colours. */
     public static void render(PoseStack pose, net.minecraft.client.renderer.SubmitNodeCollector collector,
                               int light, net.minecraft.resources.Identifier texture, BackpackState.Wear wear) {
         var renderType = net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(texture);
+        int body = 0xFF000000 | wear.bodyColor();
+        // Details never use the bright accent colour: a lighter mesh on the body
+        // silhouette reads as a glowing rim in game. Darker shades keep the shape
+        // readable without any glow.
+        int accents = 0xFF000000 | darken(wear.bodyColor(), 0.78F);
+        int metal = 0xFF000000 | darken(wear.bodyColor(), 0.55F);
+        int roll = 0xFF000000 | darken(wear.bodyColor(), 0.86F);
         collector.submitModel(BASE, FLAP_TINT, pose, renderType, light,
-                net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY,
-                0xFF000000 | wear.bodyColor());
+                net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY, body);
         collector.submitModel(ACCENTS, FLAP_TINT, pose, renderType, light,
-                net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY,
-                0xFF000000 | wear.accentColor());
+                net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY, accents);
         if (wear.tier() >= 4) {
             collector.submitModel(FRAME, FLAP_TINT, pose, renderType, light,
-                    net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY,
-                    0xFF000000 | darken(wear.accentColor(), 0.72F));
+                    net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY, metal);
         }
         if (wear.tier() >= 10) {
             collector.submitModel(BEDROLL, FLAP_TINT, pose, renderType, light,
-                    net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY,
-                    0xFF000000 | darken(wear.bodyColor(), 0.8F));
+                    net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY, roll);
         }
     }
 

@@ -6,8 +6,5 @@
   "screen.backpacks.slot.empty": "Empty — LMB equips a backpack from your inventory",
   "screen.backpacks.slot.tier": "Equipped backpack, tier %s",
   "screen.backpacks.slot.hint": "LMB to take or put a backpack",
-  "screen.backpacks.slot.open": "RMB to open",
-  "screen.backpacks.gui.subtitle": "%s slots • %s or ESC to close",
-  "screen.backpacks.gui.total": "Total: %s items",
-  "screen.backpacks.gui.pick": "MMB to take into your hand"
+  "screen.backpacks.slot.open": "RMB to open"
 }

@@ -19,15 +19,15 @@ the 9-slot *Linen Pouch* to the 256-slot *Ultimate Backpack*.
 | Client mod (optional) | Fabric Loader **0.20.1+**, Fabric API **0.166.2+26.3**, Minecraft **26.3** |
 
 The plugin works without the mod: backpacks can be opened, equipped and crafted. The mod
-adds a 3D backpack on the player's back, a dedicated inventory slot, a one-screen window and
-its own open key. Every tier has a detailed model (side pockets, metal corner caps,
-compression straps, emblem, bedroll, pads and a lock — the higher the tier, the more parts).
+adds a 3D backpack on the player's back, a dedicated inventory slot and its own open key.
+Every tier has a detailed model (side pockets, metal corner caps, compression straps,
+emblem, bedroll, pads and a lock — the higher the tier, the more parts).
 
 ## 2. Installation
 
 ### Server (admin)
 
-1. Put `Backpacks-2.0.1.jar` into `plugins/`.
+1. Put `Backpacks-2.0.2.jar` into `plugins/`.
 2. Start the server. On first start it creates:
    - `plugins/Backpacks/config.yml` — settings;
    - `plugins/Backpacks/messages.yml` — RU/EN texts;
@@ -37,7 +37,7 @@ compression straps, emblem, bedroll, pads and a lock — the higher the tier, th
 ### Client (for the 3D model and the inventory slot)
 
 1. Install Fabric Loader 0.20.1+ for Minecraft 26.3 and Fabric API.
-2. Put `backpacks-mod-2.0.1.jar` into `mods/`.
+2. Put `backpacks-mod-2.0.2.jar` into `mods/`.
 3. Launch the game and join the server.
 
 The mod is client-side only: without the server plugin it does nothing.
@@ -79,23 +79,22 @@ right-clicking a jukebox with a backpack opens the backpack instead of playing t
 
 ## 5. The backpack window
 
-- With the mod the whole backpack opens **on one screen without pages**: a chest-style
-  window, and large tiers (up to 256 cells) are scaled down to fit. Without the mod the
-  regular chest window with pages is used.
+- The backpack opens as a **normal chest inventory**, with or without the mod. Backpacks up
+  to 45 cells use a chest sized to their capacity; larger tiers use 45 cells per page with
+  previous/page/next arrows in the last row.
 - Capacity is counted in **cells**. A cell holds one stack of an item, and from tier 9
   onward up to **27 stacks** of the same item.
-- **LMB** — take/put a stack, **RMB** — one item, **Shift+LMB** on a cell — take everything
-  from it, **Shift+LMB** on an item in your inventory — put it into the backpack.
-- Chest shortcuts work too: **number keys 1–9** swap a cell with that hotbar slot, **Q**
-  drops one item, **Ctrl+Q** drops the stack, **double-click** collects matching items,
-  and **dragging** distributes items.
-- **MMB** on a cell — take a stack from the backpack into your hand, or everything left
-  when there is less than a stack. The same works in the world: pick-block (MMB) on a
-  block or mob finds the item in the equipped backpack.
+- Vanilla chest controls work: **LMB/RMB** take or put a stack/item, **Shift+LMB** moves a
+  whole stack, **number keys 1–9** swap a cell with that hotbar slot, **Q** drops one item,
+  **Ctrl+Q** drops the stack, **double-click** collects matching items and **dragging**
+  distributes items.
+- On bulk tiers (9+) **LMB** takes a stack, **RMB** takes one item and **Shift+LMB** takes
+  everything from that cell.
+- **Pick-block (MMB)** in the world on a block or mob finds the item in the equipped
+  backpack when it is missing from your inventory.
 - A backpack cannot be placed inside another backpack.
-- The window shows the tier name, the number of cells, the total item count in a bulk cell
-  and click hints; the cursor is rendered from server snapshots, so an item is never lost
-  on logout or death.
+- The window title shows the tier and capacity, and the middle of the page row shows the
+  page, capacity and bulk-cell hints.
 
 ## 6. Crafting and upgrading
 
@@ -156,8 +155,6 @@ open-empty-hand: true   # right-click with an empty hand opens the equipped back
 require-mod: false      # kick players who do not have the client mod
 
 gui:
-  single-screen: true   # one screen without pages for modded clients (vanilla keeps the chest GUI)
-  filler: GRAY_STAINED_GLASS_PANE
   sound-open: BLOCK_CHEST_OPEN
   sound-close: BLOCK_CHEST_CLOSE
   sound-click: UI_BUTTON_CLICK
