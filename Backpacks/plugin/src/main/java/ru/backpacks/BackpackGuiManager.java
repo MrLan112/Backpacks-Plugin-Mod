@@ -1119,25 +1119,11 @@ public final class BackpackGuiManager implements Listener {
             return;
         }
 
-        // A backpack item must never end up inside another backpack.
-        if (isBackpack(event.getCursor())) {
-            event.setCancelled(true);
-            return;
-        }
-        if (event.getClick() == ClickType.NUMBER_KEY
-                && isBackpack(player.getInventory().getItem(event.getHotbarButton()))) {
-            event.setCancelled(true);
-            return;
-        }
-        if (event.getClick() == ClickType.SWAP_OFFHAND
-                && isBackpack(player.getInventory().getItemInOffHand())) {
-            event.setCancelled(true);
-            return;
-        }
-
         boolean topClick = event.getClickedInventory() == top;
         if (!topClick) {
             if (event.getAction() != InventoryAction.MOVE_TO_OTHER_INVENTORY) {
+                // Ordinary player-inventory click: vanilla handles it, including a
+                // backpack that is only moved between player slots.
                 return;
             }
             event.setCancelled(true);
@@ -1151,6 +1137,22 @@ public final class BackpackGuiManager implements Listener {
             int left = insert(session, current);
             event.setCurrentItem(left <= 0 ? null : current.asQuantity(left));
             render(session);
+            return;
+        }
+
+        // A backpack item must never end up inside another backpack.
+        if (isBackpack(event.getCursor())) {
+            event.setCancelled(true);
+            return;
+        }
+        if (event.getClick() == ClickType.NUMBER_KEY
+                && isBackpack(player.getInventory().getItem(event.getHotbarButton()))) {
+            event.setCancelled(true);
+            return;
+        }
+        if (event.getClick() == ClickType.SWAP_OFFHAND
+                && isBackpack(player.getInventory().getItemInOffHand())) {
+            event.setCancelled(true);
             return;
         }
 
@@ -1177,24 +1179,30 @@ public final class BackpackGuiManager implements Listener {
         if (!(top.getHolder() instanceof Session session) || session.inventory == null) {
             return;
         }
-        if (isBackpack(event.getOldCursor())) {
-            event.setCancelled(true);
-            return;
-        }
         if (!(event.getWhoClicked() instanceof Player player) || player != session.player) {
             return;
         }
         int topSize = top.getSize();
-        markDirty(session);
         int count = Math.min(CONTENT, session.tier.capacity() - session.page * CONTENT);
+        boolean touchesTop = false;
         for (int raw : event.getRawSlots()) {
-            if (raw >= topSize) {
+            if (raw < 0 || raw >= topSize) {
                 continue;
             }
+            touchesTop = true;
             if (session.tier.stacksPerCell() > 1 || raw >= count) {
                 event.setCancelled(true);
                 return;
             }
+        }
+        if (!touchesTop) {
+            return;
+        }
+        markDirty(session);
+        // A backpack must not be dragged into the backpack, but moving one between
+        // player slots while the window is open stays possible.
+        if (isBackpack(event.getOldCursor())) {
+            event.setCancelled(true);
         }
     }
 
