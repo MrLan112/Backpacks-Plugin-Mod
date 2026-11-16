@@ -350,22 +350,21 @@ def build_item_definition(tier, path):
 
 
 def build_entity_texture(path):
-    """Neutral cloth grain tinted by the tier colours at render time.
-
-    Kept almost flat on purpose: bright panel seams or a light border baked into
-    the texture read as a glowing outline around the worn backpack, because the
-    model UVs cross those seams at arbitrary angles.
-    """
+    """Neutral leather grain tinted by the tier colours at render time."""
     size = 64
     rnd = random.Random(4242)
     img = Image.new("RGBA", (size, size))
     px = img.load()
     for y in range(size):
         for x in range(size):
-            # Gentle vertical shading plus a little grain; no bright lines.
-            shade = int(6 * (y / (size - 1)))
-            v = 178 - shade + rnd.randint(-5, 5)
+            v = 176 + rnd.randint(-14, 14)
+            # Subtle panel seams every 16 pixels.
+            if x % 16 == 3 or y % 16 == 3:
+                v -= 18
+            if x % 16 == 4 or y % 16 == 4:
+                v += 10
             px[x, y] = (clamp(v), clamp(v), clamp(v), 255)
+    ImageDraw.Draw(img).rectangle([0, 0, size - 1, size - 1], outline=(150, 150, 150, 255))
     img.save(path)
 
 

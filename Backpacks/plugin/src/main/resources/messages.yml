@@ -1,4 +1,4 @@
-messages-version: 7
+messages-version: 8
 
 ru:
   prefix: '<gradient:#f6d365:#fda085><bold>Рюкзаки</bold></gradient> <dark_gray>»</dark_gray> '
@@ -35,7 +35,7 @@ ru:
   next: '<yellow>Следующая страница →'
   capacity: '<gray>Вместимость: <white>{size}</white> слотов'
   bulk-info: '<gray>В ячейке до <white>{stacks}</white> стаков'
-  bulk-hint: '<dark_gray>ЛКМ — стак, ПКМ — 1 шт., Shift+ЛКМ — всё'
+  bulk-hint: '<dark_gray>ЛКМ — стак, ПКМ — 1 шт., Shift+ЛКМ — всё, Q/Ctrl+Q — выбросить'
   cell-count: '<gray>{amount} шт. <dark_gray>({stacks} стак.)'
   close-hint: '<dark_gray>E — закрыть'
   gui-title: '{tier}'
@@ -107,7 +107,7 @@ en:
   next: '<yellow>Next page →'
   capacity: '<gray>Capacity: <white>{size}</white> slots'
   bulk-info: '<gray>Up to <white>{stacks}</white> stacks per cell'
-  bulk-hint: '<dark_gray>LMB — stack, RMB — 1 item, Shift+LMB — all'
+  bulk-hint: '<dark_gray>LMB — stack, RMB — 1 item, Shift+LMB — all, Q/Ctrl+Q — drop'
   cell-count: '<gray>{amount} items <dark_gray>({stacks} stacks)'
   close-hint: '<dark_gray>E to close'
   gui-title: '{tier}'

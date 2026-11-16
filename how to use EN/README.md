@@ -27,7 +27,7 @@ emblem, bedroll, pads and a lock — the higher the tier, the more parts).
 
 ### Server (admin)
 
-1. Put `Backpacks-2.0.2.jar` into `plugins/`.
+1. Put `Backpacks-2.0.3.jar` into `plugins/`.
 2. Start the server. On first start it creates:
    - `plugins/Backpacks/config.yml` — settings;
    - `plugins/Backpacks/messages.yml` — RU/EN texts;
@@ -37,7 +37,7 @@ emblem, bedroll, pads and a lock — the higher the tier, the more parts).
 ### Client (for the 3D model and the inventory slot)
 
 1. Install Fabric Loader 0.20.1+ for Minecraft 26.3 and Fabric API.
-2. Put `backpacks-mod-2.0.2.jar` into `mods/`.
+2. Put `backpacks-mod-2.0.3.jar` into `mods/`.
 3. Launch the game and join the server.
 
 The mod is client-side only: without the server plugin it does nothing.
@@ -89,7 +89,9 @@ right-clicking a jukebox with a backpack opens the backpack instead of playing t
   **Ctrl+Q** drops the stack, **double-click** collects matching items and **dragging**
   distributes items.
 - On bulk tiers (9+) **LMB** takes a stack, **RMB** takes one item and **Shift+LMB** takes
-  everything from that cell.
+  everything from that cell. The other chest shortcuts work there too: **number keys 1–9**
+  swap a cell with that hotbar slot, **Q / Ctrl+Q** drop one item / a stack, **double-click**
+  collects matching items and **dragging** distributes them across cells.
 - **Pick-block (MMB)** in the world on a block or mob finds the item in the equipped
   backpack when it is missing from your inventory.
 - A backpack cannot be placed inside another backpack.
